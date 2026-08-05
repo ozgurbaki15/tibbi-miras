@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, EB_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/components/language-provider'
+import Script from 'next/script'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -17,7 +18,7 @@ const ebGaramond = EB_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Tıbbi Miras Arşivi — Digital Library of Medical Heritage',
+  title: 'Tıbbi Miras Arşivi – Digital Library of Medical Heritage',
   description:
     'A curated digital archive of botanical, anatomical, and pharmacological manuscripts from the history of medicine.',
   generator: 'v0.app',
@@ -30,10 +31,6 @@ export const metadata: Metadata = {
       {
         url: '/icon-dark-32x32.png',
         media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
       },
     ],
     apple: '/apple-icon.png',
@@ -55,6 +52,32 @@ export default function RootLayout({
       lang="tr"
       className={`dark bg-background ${cormorant.variable} ${ebGaramond.variable}`}
     >
+      <head>
+        {/* AdSense Kodu (Next.js Formatında) */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4072443907724559"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        
+        {/* Metin Seçme Engeli (CSS) */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+          }
+        `}} />
+        
+        {/* Sağ Tık ve Kopyalama Engeli (JS) */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+          document.addEventListener('copy', function(e) { e.preventDefault(); });
+        `}} />
+      </head>
+      
       <body className="font-sans antialiased">
         <LanguageProvider>{children}</LanguageProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
