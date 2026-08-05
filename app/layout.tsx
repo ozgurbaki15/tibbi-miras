@@ -52,33 +52,37 @@ export default function RootLayout({
       lang="tr"
       className={`dark bg-background ${cormorant.variable} ${ebGaramond.variable}`}
     >
-      <head>
-        {/* AdSense Kodu (Next.js Formatında) */}
+      <body className="font-sans antialiased">
+        
+        {/* CSS ile Metin Seçme Engeli (Sunucu Uyumu İçin) */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            body {
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+          `
+        }} />
+
+        {/* AdSense Yayıncı Kodu */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4072443907724559"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        
-        {/* Metin Seçme Engeli (CSS) */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-          }
-        `}} />
-        
-        {/* Sağ Tık ve Kopyalama Engeli (JS) */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-          document.addEventListener('copy', function(e) { e.preventDefault(); });
-        `}} />
-      </head>
-      
-      <body className="font-sans antialiased">
+
+        {/* JS ile Sağ Tık ve Kopyalama Engeli */}
+        <Script id="anti-copy" strategy="afterInteractive">
+          {`
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+            document.addEventListener('copy', function(e) { e.preventDefault(); });
+            document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+          `}
+        </Script>
+
         <LanguageProvider>{children}</LanguageProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
