@@ -25,14 +25,8 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
     ],
     apple: '/apple-icon.png',
   },
@@ -53,35 +47,45 @@ export default function RootLayout({
       lang="tr"
       className={`dark bg-background ${cormorant.variable} ${ebGaramond.variable}`}
     >
-      <head>
-        {/* AdSense Kodu (Next.js Formatında) */}
+      <body className="flex min-h-screen flex-col font-sans antialiased">
+        <style dangerouslySetInnerHTML={{
+          __html: `body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }`,
+        }} />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4072443907724559"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        
-        {/* Metin Seçme Engeli (CSS) */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-          }
-        `}} />
-        
-        {/* Sağ Tık ve Kopyalama Engeli (JS) */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-          document.addEventListener('copy', function(e) { e.preventDefault(); });
-        `}} />
-      </head>
-      
-      <body className="font-sans antialiased">
+        <Script id="anti-copy" strategy="afterInteractive">
+          {`document.addEventListener('contextmenu', function(e) { e.preventDefault(); }); document.addEventListener('copy', function(e) { e.preventDefault(); }); document.addEventListener('selectstart', function(e) { e.preventDefault(); });`}
+        </Script>
         <AuthProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <div className="flex-grow">{children}</div>
+            <footer className="mt-12 w-full border-t border-border/40 bg-background/95 py-6">
+              <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>İletişim:</span>
+                  <a href="mailto:freeman3598@gmail.com" className="font-medium transition-colors hover:text-primary">
+                    freeman3598@gmail.com
+                  </a>
+                </div>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.freedscience.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-white shadow-md transition-all hover:bg-zinc-800"
+                >
+                  <span className="text-lg text-[#00ff00]" aria-hidden="true">▶</span>
+                  <span className="flex flex-col text-left">
+                    <span className="text-[10px] uppercase leading-none tracking-wider text-zinc-400">Google Play&apos;den</span>
+                    <span className="mt-0.5 text-sm font-bold leading-tight">İndirin</span>
+                  </span>
+                </a>
+              </div>
+            </footer>
+          </LanguageProvider>
         </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
