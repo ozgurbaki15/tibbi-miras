@@ -49,18 +49,12 @@ export default function RootLayout({
       className={`dark bg-background ${cormorant.variable} ${ebGaramond.variable}`}
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
-        <style dangerouslySetInnerHTML={{
-          __html: `body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }`,
-        }} />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4072443907724559"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        <Script id="anti-copy" strategy="afterInteractive">
-          {`document.addEventListener('contextmenu', function(e) { e.preventDefault(); }); document.addEventListener('copy', function(e) { e.preventDefault(); }); document.addEventListener('selectstart', function(e) { e.preventDefault(); });`}
-        </Script>
         <AuthProvider>
           <EntitlementsProvider>
             <LanguageProvider>
