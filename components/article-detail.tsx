@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ScrollText } from 'lucide-react'
 import { ArticleTabs } from '@/components/article-tabs'
+import { FavoriteButton } from '@/components/favorite-button'
 import { UI, useLanguage } from '@/components/language-provider'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import {
@@ -38,10 +39,13 @@ export function ArticleDetail({ article }: { article: Article }) {
           <h1 className="text-balance font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl">
             {title}
           </h1>
-          <div className="mt-6 flex items-center gap-4" aria-hidden="true">
-            <span className="h-px w-12 bg-border" />
-            <span className="size-1.5 rotate-45 bg-primary" />
-            <span className="h-px flex-1 bg-border" />
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="flex flex-1 items-center gap-4" aria-hidden="true">
+              <span className="h-px w-12 bg-border" />
+              <span className="size-1.5 rotate-45 bg-primary" />
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <FavoriteButton articleId={article.id} />
           </div>
         </header>
 
