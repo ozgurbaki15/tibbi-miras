@@ -4,6 +4,9 @@ export type Category = {
   id: number | string
   name_tr: string | null
   name_en: string | null
+  parent_id?: number | string | null
+  sort_order?: number | null
+  is_adult?: boolean | null
 }
 
 export type Article = {

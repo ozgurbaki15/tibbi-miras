@@ -8,7 +8,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
  * render a graceful fallback instead of crashing when the environment is not
  * yet configured.
  */
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+const validSupabaseUrl = supabaseUrl?.startsWith('http://') || supabaseUrl?.startsWith('https://')
+export const isSupabaseConfigured = Boolean(validSupabaseUrl && supabaseAnonKey)
 
 /**
  * Supabase client used across the app. We avoid throwing at module load so a
@@ -16,6 +17,6 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
  * `isSupabaseConfigured` and show a friendly message.
  */
 export const supabase = createClient(
-  supabaseUrl ?? 'https://placeholder.supabase.co',
-  supabaseAnonKey ?? 'placeholder-anon-key',
+  validSupabaseUrl ? supabaseUrl! : 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-anon-key',
 )
