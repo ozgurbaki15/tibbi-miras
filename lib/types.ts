@@ -30,6 +30,25 @@ export type Article = {
 export const ARTICLE_COLUMNS =
   'id, title_tr, title_en, image_url, free_content_tr, free_content_en, original_text, premium_content_tr, premium_content_en, category_id, is_published, is_hidden, categories ( id, name_tr, name_en )'
 
+/** Supports the URL formats used by the Android content: JSON arrays, newlines, commas, and pipes. */
+export function articleImages(imageUrl: string | null): string[] {
+  if (!imageUrl?.trim()) return []
+  const value = imageUrl.trim()
+  try {
+    const parsed: unknown = JSON.parse(value)
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    }
+    if (typeof parsed === 'string' && parsed.trim()) return [parsed.trim()]
+  } catch {
+    // The Android app also accepts plain delimited strings.
+  }
+  return value
+    .split(/\\r?\\n|\\s*\\|\\s*|\\s*,\\s*/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
 /** Localized title with a graceful fallback to the other language. */
 export function articleTitle(article: Article, lang: Lang): string {
   const primary = lang === 'tr' ? article.title_tr : article.title_en
