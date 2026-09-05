@@ -22,58 +22,59 @@ export type Article = {
   category_id: number | string | null
   is_published: boolean | null
   is_hidden: boolean | null
-  /** Populated via the `categories` relation in the select query. */
   categories?: Category | null
 }
 
-/** Columns fetched for list + detail views. */
 export const ARTICLE_COLUMNS =
   'id, title_tr, title_en, image_url, free_content_tr, free_content_en, original_text, premium_content_tr, premium_content_en, category_id, is_published, is_hidden, categories ( id, name_tr, name_en )'
 
-/** Supports the URL formats used by the Android content: JSON arrays, newlines, commas, and pipes. */
 export function articleImages(imageUrl: string | null): string[] {
   if (!imageUrl?.trim()) return []
+
   const value = imageUrl.trim()
+  const candidates: string[] = []
+
   try {
     const parsed: unknown = JSON.parse(value)
-    if (Array.isArray(parsed)) {
-      return parsed.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
-    }
-    if (typeof parsed === 'string' && parsed.trim()) return [parsed.trim()]
+    if (Array.isArray(parsed)) candidates.push(...parsed.filter((item): item is string => typeof item === 'string'))
+    if (typeof parsed === 'string') candidates.push(parsed)
   } catch {
-    // The Android app also accepts plain delimited strings.
+    // The Android app stores some image sets as comma-separated text.
   }
-  return value
-    .split(/\\r?\\n|\\s*\\|\\s*|\\s*,\\s*/)
-    .map((item) => item.trim())
-    .filter(Boolean)
+
+  if (!candidates.length) {
+    candidates.push(...value.split(/[\r\n]+|\s*\|\s*|\s*,\s*/))
+  }
+
+  const urls = candidates.flatMap((candidate) => {
+    const clean = candidate.trim().replace(/^['"\[\](){}]+|['"\[\](){}]+$/g, '')
+    const matches = clean.match(/https?:\/\/[^\s,'"\]})]+/g)
+    return matches?.length ? matches : [clean]
+  })
+
+  return Array.from(new Set(urls.map((url) => url.trim()).filter((url) => /^https?:\/\//i.test(url))))
 }
 
-/** Localized title with a graceful fallback to the other language. */
 export function articleTitle(article: Article, lang: Lang): string {
   const primary = lang === 'tr' ? article.title_tr : article.title_en
   const fallback = lang === 'tr' ? article.title_en : article.title_tr
   return primary || fallback || (lang === 'tr' ? 'Başlıksız Eser' : 'Untitled')
 }
 
-/** Localized free content with fallback to the other language. */
 export function articleContent(article: Article, lang: Lang): string | null {
   const primary = lang === 'tr' ? article.free_content_tr : article.free_content_en
   const fallback = lang === 'tr' ? article.free_content_en : article.free_content_tr
   return primary || fallback || null
 }
 
-/** Localized category name. */
 export function categoryName(article: Article, lang: Lang): string | null {
   const cat = article.categories
   if (!cat) return null
   return (lang === 'tr' ? cat.name_tr : cat.name_en) || cat.name_tr || cat.name_en || null
 }
 
-/** Build a short plain-text excerpt from a longer content field. */
 export function excerpt(text: string | null, max = 160): string {
   if (!text) return ''
   const clean = text.replace(/\s+/g, ' ').trim()
-  if (clean.length <= max) return clean
-  return `${clean.slice(0, max).trimEnd()}…`
+  return clean.length <= max ? clean : `${clean.slice(0, max).trimEnd()}…`
 }
