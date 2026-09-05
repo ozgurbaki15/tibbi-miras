@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, EB_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/components/language-provider'
+import { AuthProvider } from '@/components/auth-provider'
 import Script from 'next/script'
 import './globals.css'
 
@@ -79,7 +80,9 @@ export default function RootLayout({
       </head>
       
       <body className="font-sans antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
