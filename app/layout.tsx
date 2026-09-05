@@ -25,11 +25,8 @@ export const metadata: Metadata = {
     'A curated digital archive of botanical, anatomical, and pharmacological manuscripts from the history of medicine.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-    ],
-    apple: '/apple-icon.png',
+    icon: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-52-6YjM38w8pce83qql9HmT3vyX2Fy0em.jpg',
+    apple: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-52-6YjM38w8pce83qql9HmT3vyX2Fy0em.jpg',
   },
 }
 
