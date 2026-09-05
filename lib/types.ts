@@ -30,15 +30,29 @@ export const ARTICLE_COLUMNS =
 
 export function articleImages(imageUrl: string | null): string[] {
   if (!imageUrl?.trim()) return []
+
   const value = imageUrl.trim()
+  const candidates: string[] = []
+
   try {
     const parsed: unknown = JSON.parse(value)
-    if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map((item) => item.trim())
-    if (typeof parsed === 'string' && parsed.trim()) return [parsed.trim()]
+    if (Array.isArray(parsed)) candidates.push(...parsed.filter((item): item is string => typeof item === 'string'))
+    if (typeof parsed === 'string') candidates.push(parsed)
   } catch {
-    // Android content also stores comma-separated URLs.
+    // The Android app stores some image sets as comma-separated text.
   }
-  return value.split(/[\r\n]+|\s*\|\s*|\s*,\s*/).map((item) => item.trim()).filter(Boolean)
+
+  if (!candidates.length) {
+    candidates.push(...value.split(/[\r\n]+|\s*\|\s*|\s*,\s*/))
+  }
+
+  const urls = candidates.flatMap((candidate) => {
+    const clean = candidate.trim().replace(/^['"\[\](){}]+|['"\[\](){}]+$/g, '')
+    const matches = clean.match(/https?:\/\/[^\s,'"\]})]+/g)
+    return matches?.length ? matches : [clean]
+  })
+
+  return Array.from(new Set(urls.map((url) => url.trim()).filter((url) => /^https?:\/\//i.test(url))))
 }
 
 export function articleTitle(article: Article, lang: Lang): string {
