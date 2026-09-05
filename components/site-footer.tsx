@@ -15,10 +15,10 @@ export function SiteFooter({ width = 'wide' }: { width?: 'wide' | 'narrow' }) {
         <div>{UI[lang].footer}</div>
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 normal-case tracking-normal">
           <a
-            href="mailto:iletisim@tibbimiras.com"
+            href="mailto:freeman3598@gmail.com"
             className="transition-colors hover:text-primary"
           >
-            iletisim@tibbimiras.com
+            freeman3598@gmail.com
           </a>
           <span className="text-border" aria-hidden="true">·</span>
           <Link

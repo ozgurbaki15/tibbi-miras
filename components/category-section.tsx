@@ -9,13 +9,11 @@ import type { Category } from '@/lib/types'
 type CategoryNode = Category & { children: CategoryNode[] }
 
 function buildTree(categories: Category[]): CategoryNode[] {
-  const nodes = new Map<string, CategoryNode>()
-  categories.forEach((category) => nodes.set(String(category.id), { ...category, children: [] }))
+  const nodes = new Map(categories.map((category) => [String(category.id), { ...category, children: [] as CategoryNode[] }]))
   const roots: CategoryNode[] = []
   nodes.forEach((node) => {
-    const parent = node.parent_id == null ? null : nodes.get(String(node.parent_id))
-    if (parent) parent.children.push(node)
-    else roots.push(node)
+    if (node.parent_id == null) roots.push(node)
+    else nodes.get(String(node.parent_id))?.children.push(node)
   })
   const sortTree = (items: CategoryNode[]) => {
     items.sort((a, b) => (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER) || String(a.id).localeCompare(String(b.id)))
@@ -25,7 +23,7 @@ function buildTree(categories: Category[]): CategoryNode[] {
   return roots
 }
 
-function CategoryBranch({ node }: { node: CategoryNode }) {
+function CategoryBranch({ node, depth = 0 }: { node: CategoryNode; depth?: number }) {
   const { lang } = useLanguage()
   const [open, setOpen] = useState(false)
   const name = lang === 'tr' ? node.name_tr || node.name_en : node.name_en || node.name_tr
@@ -48,22 +46,19 @@ function CategoryBranch({ node }: { node: CategoryNode }) {
           </Link>
         )}
       </div>
-      {hasChildren && open ? <div className="flex flex-col gap-2 border-s-2 border-primary/30 ps-4">{node.children.map((child) => <CategoryBranch key={child.id} node={child} />)}</div> : null}
+      {hasChildren && open ? <div className="flex flex-col gap-2 border-s-2 border-primary/30 ps-4">{node.children.map((child) => <CategoryBranch key={child.id} node={child} depth={depth + 1} />)}</div> : null}
     </div>
   )
 }
 
 export function CategorySection({ categories }: { categories: Category[] }) {
   const { lang } = useLanguage()
-  const tree = buildTree(categories.filter((category) => !category.is_adult && (category.name_tr || category.name_en)))
+  const tree = buildTree(categories.filter((category) => category.parent_id == null && !category.is_adult && (category.name_tr || category.name_en)))
   if (!tree.length) return null
   return (
     <section className="mx-auto max-w-6xl px-6 pb-8" aria-labelledby="categories-heading">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p>
-          <h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'Koleksiyonlar' : 'Collections'}</h2>
-        </div>
+        <div><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'Koleksiyonlar' : 'Collections'}</h2></div>
         <Link href="/categories" className="font-sans text-xs uppercase tracking-wider text-primary hover:text-accent">{lang === 'tr' ? 'Tümünü gör' : 'View all'}</Link>
       </div>
       <div className="flex flex-col gap-2">{tree.map((node) => <CategoryBranch key={node.id} node={node} />)}</div>
