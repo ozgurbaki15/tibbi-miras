@@ -4,6 +4,7 @@ import { Cormorant_Garamond, EB_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/components/language-provider'
 import { AuthProvider } from '@/components/auth-provider'
 import { EntitlementsProvider } from '@/components/entitlements-provider'
+import { ThemeProvider } from '@/components/theme-provider'
 import Script from 'next/script'
 import './globals.css'
 
@@ -31,8 +32,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#241f16',
+  colorScheme: 'light dark',
+  themeColor: '#f5f0e5',
 }
 
 export default function RootLayout({
@@ -43,7 +44,8 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`dark bg-background ${cormorant.variable} ${ebGaramond.variable}`}
+      data-theme="parchment"
+      className={`bg-background ${cormorant.variable} ${ebGaramond.variable}`}
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <Script
@@ -52,9 +54,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        <AuthProvider>
-          <EntitlementsProvider>
-            <LanguageProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <EntitlementsProvider>
+              <LanguageProvider>
               <div className="flex-grow">{children}</div>
               <footer className="mt-12 w-full border-t border-border/40 bg-background/95 py-6">
                 <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row">
@@ -68,9 +71,10 @@ export default function RootLayout({
                   </a>
                 </div>
               </footer>
-            </LanguageProvider>
-          </EntitlementsProvider>
-        </AuthProvider>
+              </LanguageProvider>
+            </EntitlementsProvider>
+          </AuthProvider>
+        </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
