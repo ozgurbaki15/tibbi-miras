@@ -17,9 +17,22 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    const error = new URLSearchParams(window.location.search).get('error')
+    const params = new URLSearchParams(window.location.search)
+    const error = params.get('error')
     if (error === 'auth_callback_failed') setMessage('Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.')
     if (error === 'auth_callback_missing_code') setMessage('Google giriş dönüş kodu alınamadı. Lütfen tekrar deneyin.')
+
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const accessToken = hash.get('access_token')
+    const refreshToken = hash.get('refresh_token')
+    if (accessToken && refreshToken) {
+      setBusy(true)
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(({ error: sessionError }) => {
+        if (sessionError) setMessage('Google oturumu oluşturulamadı. Lütfen tekrar deneyin.')
+        else window.history.replaceState({}, '', '/login')
+        setBusy(false)
+      })
+    }
   }, [])
 
   async function submit(event: FormEvent) {
