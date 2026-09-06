@@ -8,7 +8,7 @@ import type { Category } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 export default async function CategoriesPage() {
-  const { data, error } = isSupabaseConfigured ? await supabase.from('categories').select('id, name_tr, name_en, parent_id, sort_order, is_adult').order('sort_order', { ascending: true }) : { data: null, error: null }
+  const { data, error } = isSupabaseConfigured ? await supabase.from('categories').select('id, name_tr, name_en, parent_id, sort_order, is_adult').eq('is_adult', false).order('sort_order', { ascending: true }) : { data: null, error: null }
   const categories = (data ?? []) as Category[]
   return <main className="min-h-svh bg-background"><ArchiveHeader /><ArchiveNavigation /><section className="mx-auto max-w-6xl px-6 py-14"><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">Archive index</p><h1 className="mb-10 font-serif text-5xl text-foreground">Kategoriler</h1>{error ? <pre className="rounded border border-destructive/40 p-5 font-mono text-xs text-destructive">{error.message}</pre> : <CategoryIndexGrid categories={categories} />}</section><SiteFooter /></main>
 }
