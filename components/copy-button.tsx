@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEntitlements } from '@/components/entitlements-provider'
@@ -37,10 +38,13 @@ export function CopyButton({ text, isPremiumContent = false, isPlatinContent = f
   }
 
   return (
-    <Button type="button" onClick={copyText} aria-label="Metni kopyala" className="fixed bottom-5 right-5 z-50 rounded-full border-2 border-emerald-300 bg-emerald-600 px-5 py-3 font-sans text-xs font-semibold uppercase tracking-wider text-white shadow-[0_8px_30px_rgba(16,185,129,0.35)] transition hover:bg-emerald-500">
-      {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-      <span>{copied ? 'Kopyalandı' : 'Kopyala'}</span>
-      {remaining !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px]">{remaining}</span> : null}
-    </Button>
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+      {!platin ? <Link href="/settings" className="rounded-full border border-primary/60 bg-card px-3 py-1.5 font-sans text-[10px] font-semibold uppercase tracking-wider text-primary shadow-lg transition hover:bg-primary hover:text-primary-foreground">Premium / Platin satın al</Link> : null}
+      <Button type="button" onClick={copyText} aria-label="Metni kopyala" className="rounded-full border-2 border-emerald-300 bg-emerald-600 px-5 py-3 font-sans text-xs font-semibold uppercase tracking-wider text-white shadow-[0_8px_30px_rgba(16,185,129,0.35)] transition hover:bg-emerald-500">
+        {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+        <span>{copied ? 'Kopyalandı' : 'Kopyala'}</span>
+        {remaining !== null ? <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px]">{remaining}</span> : null}
+      </Button>
+    </div>
   )
 }
