@@ -43,11 +43,11 @@ export default function LoginPage() {
     const normalizedEmail = email.trim().toLowerCase()
     const result = mode === 'signin'
       ? await supabase.auth.signInWithPassword({ email: normalizedEmail, password })
-      : await supabase.auth.signUp({ email: normalizedEmail, password, options: { emailRedirectTo: authRedirectUrl() } })
+      : await supabase.auth.signUp({ email: normalizedEmail, password, options: { emailRedirectTo: emailRedirectUrl() } })
     setMessage(result.error?.message ?? (mode === 'signup' ? 'E-posta adresinizi doğrulayın.' : 'Giriş başarılı.'))
     setBusy(false)
   }
-  function authRedirectUrl() {
+  function emailRedirectUrl() {
     return process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`
   }
 
@@ -55,7 +55,7 @@ export default function LoginPage() {
     if (!isSupabaseConfigured) { setMessage('Giriş sistemi yapılandırılmamış.'); return }
     setBusy(true)
     setMessage('')
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: authRedirectUrl() } })
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/login` } })
     if (error) setMessage(error.message)
     setBusy(false)
   }
