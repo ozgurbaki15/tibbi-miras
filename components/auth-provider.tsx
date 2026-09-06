@@ -13,8 +13,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isSupabaseConfigured) { setLoading(false); return }
     let active = true
-    supabase.auth.getSession().then(({ data }) => { if (active) { setSession(data.session); setLoading(false) } })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession))
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!active) return
+      if (error) console.error('[v0] Supabase session error:', error.message)
+      setSession(data.session)
+      setLoading(false)
+    })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (active) {
+        setSession(nextSession)
+        setLoading(false)
+      }
+    })
     return () => { active = false; listener.subscription.unsubscribe() }
   }, [])
   const value = useMemo(() => ({ user: session?.user ?? null, session, loading, signOut: async () => { await supabase.auth.signOut() } }), [session, loading])
