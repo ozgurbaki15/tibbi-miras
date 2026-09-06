@@ -58,7 +58,7 @@ export function useLanguage() {
 /** Small UI string dictionary keyed by language. */
 export const UI = {
   tr: {
-    eyebrow: 'Dijital Tıp Tarihi Kütüphanesi',
+    eyebrow: 'Freed Science',
     intro:
       'Botanik levhalardan anatomi gravürlerine, eczacılık terkiplerinden gök cisimlerine uzanan tıp tarihinin nadide el yazmaları ve basılı eserleri. Şifanın binlerce yıllık hafızasını tek bir çatı altında derliyoruz.',
     collection: 'Koleksiyon',
@@ -73,10 +73,10 @@ export const UI = {
     originalHeading: 'Orijinal Tarihî Metin',
     originalNote: 'Eserin özgün nüshasından aktarılmıştır.',
     emptyContent: 'Bu sürüm için metin henüz mevcut değil.',
-    footer: 'Tıbbi Miras Arşivi · Şifanın Hafızası',
+    footer: 'Tıbbi Miras Arşivi · Kaybolan Tıbbın İhyası',
   },
   en: {
-    eyebrow: 'Digital Library of Medical History',
+    eyebrow: 'Freed Science',
     intro:
       'Rare manuscripts and printed works spanning the history of medicine — from botanical plates and anatomical engravings to apothecary formulas and celestial charts. We gather the millennia-old memory of healing under a single roof.',
     collection: 'Collection',
@@ -91,6 +91,6 @@ export const UI = {
     originalHeading: 'Original Historical Text',
     originalNote: 'Transcribed from the original manuscript.',
     emptyContent: 'Text for this version is not available yet.',
-    footer: 'Medical Heritage Archive · The Memory of Healing',
+    footer: 'Medical Heritage Archive · Unearthing Lost Wisdom',
   },
 } as const
