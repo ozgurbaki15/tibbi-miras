@@ -17,9 +17,22 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    const error = new URLSearchParams(window.location.search).get('error')
+    const params = new URLSearchParams(window.location.search)
+    const error = params.get('error')
     if (error === 'auth_callback_failed') setMessage('Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.')
     if (error === 'auth_callback_missing_code') setMessage('Google giriş dönüş kodu alınamadı. Lütfen tekrar deneyin.')
+
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const accessToken = hash.get('access_token')
+    const refreshToken = hash.get('refresh_token')
+    if (accessToken && refreshToken) {
+      setBusy(true)
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(({ error: sessionError }) => {
+        if (sessionError) setMessage('Google oturumu oluşturulamadı. Lütfen tekrar deneyin.')
+        else window.history.replaceState({}, '', '/login')
+        setBusy(false)
+      })
+    }
   }, [])
 
   async function submit(event: FormEvent) {
@@ -30,28 +43,19 @@ export default function LoginPage() {
     const normalizedEmail = email.trim().toLowerCase()
     const result = mode === 'signin'
       ? await supabase.auth.signInWithPassword({ email: normalizedEmail, password })
-      : await supabase.auth.signUp({ email: normalizedEmail, password, options: { emailRedirectTo: authRedirectUrl() } })
+      : await supabase.auth.signUp({ email: normalizedEmail, password, options: { emailRedirectTo: emailRedirectUrl() } })
     setMessage(result.error?.message ?? (mode === 'signup' ? 'E-posta adresinizi doğrulayın.' : 'Giriş başarılı.'))
     setBusy(false)
   }
-  function authRedirectUrl() {
-    const configured = process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
-    if (configured) {
-      try {
-        const parsed = new URL(configured)
-        if (parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1') return configured
-      } catch {
-        // Fall through to the active preview origin when the injected value is invalid.
-      }
-    }
-    return `${window.location.origin}/auth/callback`
+  function emailRedirectUrl() {
+    return process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`
   }
 
   async function google() {
     if (!isSupabaseConfigured) { setMessage('Giriş sistemi yapılandırılmamış.'); return }
     setBusy(true)
     setMessage('')
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: authRedirectUrl() } })
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/login` } })
     if (error) setMessage(error.message)
     setBusy(false)
   }
