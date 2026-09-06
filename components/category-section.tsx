@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, FolderTree } from 'lucide-react'
+import { ChevronDown, FolderTree, Minus, Plus } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 import type { Category } from '@/lib/types'
 
@@ -35,14 +35,14 @@ function CategoryBranch({ node, depth = 0 }: { node: CategoryNode; depth?: numbe
       <div className="flex items-center rounded-md border border-border bg-card/50 transition-colors hover:border-primary/50 hover:bg-card">
         {hasChildren ? (
           <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex min-h-14 flex-1 items-center gap-3 p-4 text-left">
-            <FolderTree className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            <span className="font-serif text-lg text-card-foreground">{name}</span>
-            <ChevronDown className={`ml-auto size-5 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+            {open ? <Minus className="size-4 shrink-0 text-primary" aria-hidden="true" /> : <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />}
+            <FolderTree className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span className="font-sans text-sm font-medium text-card-foreground">{name}</span>
           </button>
         ) : (
-          <Link href={`/categories/${node.id}`} className="flex min-h-14 flex-1 items-center gap-3 p-4">
-            <FolderTree className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            <span className="font-serif text-lg text-card-foreground">{name}</span>
+          <Link href={`/categories/${node.id}`} className="flex min-h-10 flex-1 items-center gap-2 px-3 py-2">
+            <FolderTree className="size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span className="font-sans text-sm text-card-foreground">{name}</span>
           </Link>
         )}
       </div>
@@ -53,7 +53,7 @@ function CategoryBranch({ node, depth = 0 }: { node: CategoryNode; depth?: numbe
 
 export function CategorySection({ categories }: { categories: Category[] }) {
   const { lang } = useLanguage()
-  const tree = buildTree(categories.filter((category) => category.parent_id == null && !category.is_adult && (category.name_tr || category.name_en)))
+  const tree = buildTree(categories.filter((category) => !category.is_adult && (category.name_tr || category.name_en)))
   if (!tree.length) return null
   return (
     <section className="mx-auto max-w-6xl px-6 pb-8" aria-labelledby="categories-heading">
@@ -61,7 +61,7 @@ export function CategorySection({ categories }: { categories: Category[] }) {
         <div><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'Koleksiyonlar' : 'Collections'}</h2></div>
         <Link href="/categories" className="font-sans text-xs uppercase tracking-wider text-primary hover:text-accent">{lang === 'tr' ? 'Tümünü gör' : 'View all'}</Link>
       </div>
-      <div className="flex flex-col gap-2">{tree.map((node) => <CategoryBranch key={node.id} node={node} />)}</div>
+      <div className="flex flex-col gap-1">{tree.map((node) => <CategoryBranch key={node.id} node={node} />)}</div>
     </section>
   )
 }
