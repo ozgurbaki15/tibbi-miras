@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    const error = new URLSearchParams(window.location.search).get('error')
+    if (error === 'auth_callback_failed') setMessage('Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.')
+    if (error === 'auth_callback_missing_code') setMessage('Google giriş dönüş kodu alınamadı. Lütfen tekrar deneyin.')
+  }, [])
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     if (!isSupabaseConfigured) { setMessage('Giriş sistemi yapılandırılmamış.'); return }
@@ -29,7 +36,15 @@ export default function LoginPage() {
   }
   function authRedirectUrl() {
     const configured = process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
-    return configured && !configured.includes('localhost') ? configured : `${window.location.origin}/auth/callback`
+    if (configured) {
+      try {
+        const parsed = new URL(configured)
+        if (parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1') return configured
+      } catch {
+        // Fall through to the active preview origin when the injected value is invalid.
+      }
+    }
+    return `${window.location.origin}/auth/callback`
   }
 
   async function google() {

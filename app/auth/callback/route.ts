@@ -5,13 +5,18 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
   const next = url.searchParams.get('next')
-  const safeNext = next?.startsWith('/') ? next : '/'
+  const safeNext = next?.startsWith('/') && !next.startsWith('//') ? next : '/'
 
-  if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return NextResponse.redirect(new URL(safeNext, url.origin))
+  if (!code) {
+    return NextResponse.redirect(new URL('/login?error=auth_callback_missing_code', url.origin))
   }
 
-  return NextResponse.redirect(new URL('/login?error=auth_callback_failed', url.origin))
+  const supabase = await createClient()
+  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  if (error) {
+    console.error('[v0] Supabase OAuth callback failed:', error.message)
+    return NextResponse.redirect(new URL('/login?error=auth_callback_failed', url.origin))
+  }
+
+  return NextResponse.redirect(new URL(safeNext, url.origin))
 }
