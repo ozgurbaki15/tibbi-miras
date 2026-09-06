@@ -35,7 +35,16 @@ export default function LoginPage() {
     setBusy(false)
   }
   function authRedirectUrl() {
-    return process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`
+    const configured = process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
+    if (configured) {
+      try {
+        const parsed = new URL(configured)
+        if (parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1') return configured
+      } catch {
+        // Fall through to the active preview origin when the injected value is invalid.
+      }
+    }
+    return `${window.location.origin}/auth/callback`
   }
 
   async function google() {
