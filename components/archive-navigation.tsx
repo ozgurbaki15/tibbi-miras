@@ -7,8 +7,8 @@ import { useLanguage } from '@/components/language-provider'
 export function ArchiveNavigation() {
   const { lang } = useLanguage()
   const labels = lang === 'tr'
-    ? { home: 'Arşiv', categories: 'Kategoriler', search: 'Arama', favorites: 'Favoriler', settings: 'Ayarlar' }
-    : { home: 'Archive', categories: 'Categories', search: 'Search', favorites: 'Favorites', settings: 'Settings' }
+    ? { home: 'Anasayfa', categories: 'Kategoriler', search: 'Arama', favorites: 'Favoriler', settings: 'Ayarlar' }
+    : { home: 'Home', categories: 'Categories', search: 'Search', favorites: 'Favorites', settings: 'Settings' }
 
   const items = [
     { href: '/', label: labels.home, icon: BookOpen },
