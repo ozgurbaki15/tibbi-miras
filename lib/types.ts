@@ -76,6 +76,17 @@ export function categoryName(article: Article, lang: Lang): string | null {
   return (lang === 'tr' ? cat.name_tr : cat.name_en) || cat.name_tr || cat.name_en || null
 }
 
+// The original historical text is gated after the first bracketed source: the
+// text up to and including the first "[...]" citation stays visible, the rest
+// requires premium/platin membership or an unlock synced from the mobile app.
+export function originalTextPreview(text: string): { preview: string; locked: string } {
+  const open = text.indexOf('[')
+  if (open === -1) return { preview: text, locked: '' }
+  const close = text.indexOf(']', open)
+  const cut = close === -1 ? open : close + 1
+  return { preview: text.slice(0, cut).trimEnd(), locked: text.slice(cut).trim() }
+}
+
 export function excerpt(text: string | null, max = 160): string {
   if (!text) return ''
   const clean = text.replace(/\s+/g, ' ').trim()
