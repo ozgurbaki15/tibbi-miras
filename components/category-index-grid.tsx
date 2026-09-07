@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { Beef, CupSoda, Eye, FlaskConical, Gem, Leaf, Pill, ScrollText, Shirt, Sparkles } from 'lucide-react'
+import { Beef, CupSoda, Eye, FlaskConical, Gem, Leaf, Lock, Pill, ScrollText, Shirt, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 import type { Category } from '@/lib/types'
 
@@ -27,8 +28,9 @@ function buildTree(categories: Category[]) {
   const nodes = new Map(categories.map((category) => [String(category.id), { ...category, children: [] as CategoryNode[] }]))
   const roots: CategoryNode[] = []
   nodes.forEach((node) => {
-    if (node.parent_id == null) roots.push(node)
-    else nodes.get(String(node.parent_id))?.children.push(node)
+    const parent = node.parent_id == null ? undefined : nodes.get(String(node.parent_id))
+    if (parent) parent.children.push(node)
+    else roots.push(node)
   })
   const sort = (items: CategoryNode[]) => {
     items.sort((a, b) => (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER) || String(a.name_tr || a.name_en || '').localeCompare(String(b.name_tr || b.name_en || ''), 'tr'))
@@ -55,10 +57,8 @@ function CategoryCard({ category, child = false }: { category: Category; child?:
   )
 }
 
-export function CategoryIndexGrid({ categories }: { categories: Category[] }) {
+function CategoryTree({ tree }: { tree: CategoryNode[] }) {
   const { lang } = useLanguage()
-  const tree = buildTree(categories.filter((category) => !category.is_adult && category.id !== 73 && (category.name_tr || category.name_en)))
-
   return (
     <div className="flex flex-col gap-10">
       {tree.map((parent) => (
@@ -68,6 +68,43 @@ export function CategoryIndexGrid({ categories }: { categories: Category[] }) {
           {parent.children.length > 0 ? <div className="grid items-start gap-4 border-s-2 border-primary/25 ps-4 sm:grid-cols-2 lg:grid-cols-3">{parent.children.map((child) => <CategoryCard key={child.id} category={child} child />)}</div> : null}
         </section>
       ))}
+    </div>
+  )
+}
+
+function AdultSection({ tree }: { tree: CategoryNode[] }) {
+  const { lang } = useLanguage()
+  const [revealed, setRevealed] = useState(false)
+  if (!tree.length) return null
+
+  return (
+    <section aria-labelledby="adult-heading" className="mt-14 flex flex-col gap-5 rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-destructive/40 bg-background/70"><Lock aria-hidden="true" className="size-5 text-destructive" /></span>
+        <div>
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.25em] text-destructive">18+</p>
+          <h2 id="adult-heading" className="font-serif text-3xl text-foreground">{lang === 'tr' ? 'Yetişkin İçerik' : 'Adult Content'}</h2>
+        </div>
+      </div>
+      <p className="max-w-2xl text-pretty font-sans text-sm leading-relaxed text-muted-foreground">{lang === 'tr' ? 'Bu bölüm yalnızca yetişkinlere yönelik tıbbi içerikler barındırır. Devam etmek için 18 yaşından büyük olduğunuzu onaylayın.' : 'This section contains medical content intended for adults only. Confirm that you are over 18 to continue.'}</p>
+      {revealed ? <CategoryTree tree={tree} /> : (
+        <button type="button" onClick={() => setRevealed(true)} className="self-start rounded-full border border-destructive/60 bg-background px-5 py-2 font-sans text-xs font-semibold uppercase tracking-wider text-destructive transition hover:bg-destructive hover:text-destructive-foreground">
+          {lang === 'tr' ? '18 yaşından büyüğüm, göster' : 'I am over 18, show'}
+        </button>
+      )}
+    </section>
+  )
+}
+
+export function CategoryIndexGrid({ categories }: { categories: Category[] }) {
+  const named = categories.filter((category) => category.id !== 73 && (category.name_tr || category.name_en))
+  const tree = buildTree(named.filter((category) => !category.is_adult))
+  const adultTree = buildTree(named.filter((category) => category.is_adult))
+
+  return (
+    <div className="flex flex-col">
+      <CategoryTree tree={tree} />
+      <AdultSection tree={adultTree} />
     </div>
   )
 }
