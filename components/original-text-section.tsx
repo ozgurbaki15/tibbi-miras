@@ -7,6 +7,8 @@ import { LinkedArticleText } from '@/components/linked-article-text'
 import { UI, useLanguage } from '@/components/language-provider'
 import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
+import { CheckoutButton } from '@/components/checkout-button'
+import { getProduct, priceLabel } from '@/lib/products'
 import { originalTextPreview, type Article, type ArticleTerm } from '@/lib/types'
 
 export function OriginalTextSection({ article, terms = [] }: { article: Article; terms?: ArticleTerm[] }) {
@@ -58,14 +60,23 @@ export function OriginalTextSection({ article, terms = [] }: { article: Article;
                       ? 'Devamını okumak için giriş yapın. Premium/Platin üyeler ve uygulamada bu eseri açan kullanıcılar tümünü görür.'
                       : 'Sign in to continue. Premium/Platin members and users who unlocked this work in the app can see all of it.')}
               </p>
-              <Link
-                href={user ? '/settings' : '/login'}
-                className="mt-4 rounded-md bg-primary px-4 py-2 font-sans text-xs uppercase tracking-wider text-primary-foreground"
-              >
-                {user
-                  ? (lang === 'tr' ? 'Erişim seçenekleri' : 'Access options')
-                  : (lang === 'tr' ? 'Giriş yap' : 'Sign in')}
-              </Link>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                {user ? (
+                  <CheckoutButton
+                    productId="single-unlock"
+                    articleId={String(article.id)}
+                    label={lang === 'tr' ? `Bu eseri aç · ${priceLabel(getProduct('single-unlock')!.amountKurus, 'tr')}` : `Unlock this work · ${priceLabel(getProduct('single-unlock')!.amountKurus, 'en')}`}
+                  />
+                ) : null}
+                <Link
+                  href={user ? '/settings' : '/login'}
+                  className="rounded-md border border-primary/60 px-4 py-2 font-sans text-xs uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  {user
+                    ? (lang === 'tr' ? 'Üyelik seçenekleri' : 'Membership options')
+                    : (lang === 'tr' ? 'Giriş yap' : 'Sign in')}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

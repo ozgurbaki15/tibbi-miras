@@ -5,7 +5,7 @@ import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus } from
 import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
 import { useLanguage } from '@/components/language-provider'
-import { CheckoutButton } from '@/components/checkout-button'
+import { MembershipPlans } from '@/components/membership-plans'
 
 function formatDate(value: number | string | null | undefined, lang: 'tr' | 'en') {
   if (value == null) return null
@@ -43,6 +43,7 @@ export function AccountPanel() {
   const expiryDate = formatDate(membershipExpiresAt, lang)
   const daysLeft = membershipExpiresAt != null && !isLifetime ? Math.max(0, Math.ceil((membershipExpiresAt - Date.now()) / 86400000)) : null
   const registered = formatDate(user.created_at, lang)
+  const isPlatinLifetime = platin && isLifetime
 
   return (
     <section className="overflow-hidden rounded-md border border-border bg-card">
@@ -89,14 +90,11 @@ export function AccountPanel() {
         ) : null}
       </dl>
 
-      {!isMember ? (
+      {!isPlatinLifetime ? (
         <div className="border-t border-border p-6">
-          <h3 className="font-serif text-xl text-card-foreground">{tr ? 'Premium erişim' : 'Premium access'}</h3>
-          <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{tr ? 'Tarihî arşivin genişletilmiş metinlerine ve özel eserlere erişin.' : 'Unlock extended texts and exclusive works from the historical archive.'}</p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <CheckoutButton productId="premium-monthly" label={tr ? 'Premium ol' : 'Get Premium'} />
-            <CheckoutButton productId="platin-monthly" label={tr ? 'Platin ol' : 'Get Platin'} />
-          </div>
+          <h3 className="font-serif text-xl text-card-foreground">{isMember ? (tr ? 'Üyeliğini yükselt' : 'Upgrade your membership') : (tr ? 'Üyelik planları' : 'Membership plans')}</h3>
+          <p className="mb-5 mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{tr ? 'Tarihî arşivin genişletilmiş metinlerine ve özel eserlere erişin. Uygulamada satın aldığınız üyelik burada da geçerlidir.' : 'Unlock extended texts and exclusive works. Memberships purchased in the app also work here.'}</p>
+          <MembershipPlans premium={premium} platin={platin} isPremiumLifetime={premium && isLifetime} isPlatinLifetime={platin && isLifetime} />
         </div>
       ) : null}
     </section>
