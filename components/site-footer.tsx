@@ -14,19 +14,15 @@ export function SiteFooter({ width = 'wide' }: { width?: 'wide' | 'narrow' }) {
       >
         <div>{UI[lang].footer}</div>
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 normal-case tracking-normal">
-          <a
-            href="mailto:freeman3598@gmail.com"
-            className="transition-colors hover:text-primary"
-          >
-            freeman3598@gmail.com
-          </a>
+          <Link href="/uyelikler" className="transition-colors hover:text-primary">Üyelikler</Link>
           <span className="text-border" aria-hidden="true">·</span>
-          <Link
-            href="/legal"
-            className="transition-colors hover:text-primary"
-          >
-            Yasal Uyarılar ve Gizlilik
-          </Link>
+          <Link href="/legal/mesafeli-satis" className="transition-colors hover:text-primary">Mesafeli Satış</Link>
+          <span className="text-border" aria-hidden="true">·</span>
+          <Link href="/legal/iade-iptal" className="transition-colors hover:text-primary">İptal ve İade</Link>
+          <span className="text-border" aria-hidden="true">·</span>
+          <Link href="/legal" className="transition-colors hover:text-primary">Yasal Uyarılar ve Gizlilik</Link>
+          <span className="text-border" aria-hidden="true">·</span>
+          <Link href="/iletisim" className="transition-colors hover:text-primary">İletişim</Link>
         </div>
       </div>
     </footer>

@@ -32,8 +32,10 @@ function PlanCard({ product, highlight }: { product: Product; highlight?: boolea
 // reflects meaningful upgrade paths (incl. the difference-only lifetime upgrade).
 function offersFor({ premium, platin, isPremiumLifetime, isPlatinLifetime }: { premium: boolean; platin: boolean; isPremiumLifetime: boolean; isPlatinLifetime: boolean }): { ids: string[]; highlightId?: string } {
   if (isPlatinLifetime) return { ids: [] }
+  // Difference-only upgrade applies to lifetime (and yearly) tiers. A monthly
+  // membership is always re-purchased at full price, starting on the buy date.
+  if (isPremiumLifetime) return { ids: ['platin-lifetime-upgrade'], highlightId: 'platin-lifetime-upgrade' }
   if (platin) return { ids: ['platin-lifetime'], highlightId: 'platin-lifetime' }
-  if (isPremiumLifetime) return { ids: ['platin-lifetime-upgrade', 'platin-yearly', 'platin-monthly'], highlightId: 'platin-lifetime-upgrade' }
   if (premium) return { ids: ['platin-monthly', 'platin-yearly', 'platin-lifetime', 'premium-lifetime'], highlightId: 'platin-yearly' }
   return { ids: ['premium-monthly', 'premium-yearly', 'platin-monthly', 'platin-yearly', 'premium-lifetime', 'platin-lifetime'], highlightId: 'platin-yearly' }
 }
