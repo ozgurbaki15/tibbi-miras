@@ -91,7 +91,7 @@ export default function OrdersPage() {
                           {order.address_warning ? <span>{tr ? 'Teslimat adresiniz yanlış görünüyor.' : 'Your delivery address appears to be incorrect.'}</span> : null}
                         </span>
                       </div>
-                      <Link href="/adreslerim" className="text-xs font-medium uppercase tracking-wider text-destructive underline underline-offset-4">{tr ? 'Telefon/adres bilgilerimi değiştir' : 'Change phone/address'}</Link>
+                      <Link href={`/adreslerim?order=${encodeURIComponent(order.id)}`} className="text-xs font-medium uppercase tracking-wider text-destructive underline underline-offset-4">{tr ? 'Telefon/adres bilgilerimi değiştir' : 'Change phone/address'}</Link>
                     </div>
                   ) : null}
                 </article>
