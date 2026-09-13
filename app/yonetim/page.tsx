@@ -9,6 +9,7 @@ import { useAuth } from '@/components/auth-provider'
 import { ProductManager } from '@/components/admin/product-manager'
 import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { CommunityCommerceManager } from '@/components/admin/community-commerce-manager'
+import { OrderAlertManager } from '@/components/admin/order-alert-manager'
 
 export default function YonetimPage() {
   const { user, loading } = useAuth()
@@ -51,6 +52,7 @@ export default function YonetimPage() {
             </p>
             <ProductManager />
             <CommunityCommerceManager />
+            <OrderAlertManager />
           </>
         )}
       </section>
