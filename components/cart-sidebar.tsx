@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/components/cart-provider'
 import { useProducts } from '@/components/products-provider'
@@ -17,17 +17,10 @@ export function CartSidebar() {
     <>
       <div className="fixed right-4 top-24 z-40 flex flex-col gap-3">
         <button type="button" onClick={() => setOpen(true)} aria-label="Sepeti aç" className="relative inline-flex size-12 items-center justify-center rounded-full border border-primary/50 bg-card text-primary shadow-lg transition-transform hover:scale-105">
-          <ShoppingBag className="size-5" aria-hidden="true" />
+          <ShoppingCart className="size-5" aria-hidden="true" />
           {count > 0 ? <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{count > 99 ? '99+' : count}</span> : null}
         </button>
       </div>
-      <div className="fixed bottom-5 right-4 z-40">
-        <button type="button" onClick={() => setOpen(true)} aria-label="Sepeti aç" className="relative inline-flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform hover:scale-105">
-          <ShoppingBag className="size-6" aria-hidden="true" />
-          {count > 0 ? <span className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full border-2 border-primary bg-card text-[10px] font-bold text-foreground">{count > 99 ? '99+' : count}</span> : null}
-        </button>
-      </div>
-
       {open ? (
         <div className="fixed inset-0 z-50">
           <button type="button" aria-label="Sepeti kapat" onClick={() => setOpen(false)} className="absolute inset-0 bg-foreground/30 backdrop-blur-[2px]" />
@@ -41,7 +34,7 @@ export function CartSidebar() {
             </header>
             <div className="flex-1 overflow-y-auto p-5">
               {items.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><ShoppingBag className="size-10 text-muted-foreground" /><p className="font-sans text-sm text-muted-foreground">Sepetiniz boş.</p></div>
+                <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><ShoppingCart className="size-10 text-muted-foreground" /><p className="font-sans text-sm text-muted-foreground">Sepetiniz boş.</p></div>
               ) : (
                 <ul className="flex flex-col gap-4">
                   {items.map((item) => {
