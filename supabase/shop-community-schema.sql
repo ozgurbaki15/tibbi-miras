@@ -92,8 +92,68 @@ create policy "tma_order_items_self_read" on public.tma_order_items for select u
 create policy "tma_comments_approved_read" on public.tma_article_comments for select using (status = 'approved' or auth.uid() = user_id);
 create policy "tma_comments_self_insert" on public.tma_article_comments for insert with check (auth.uid() = user_id);
 
--- Yönetici yazma işlemleri uygulamanın server tarafında admin kontrolüyle yapılır.
--- Üretimde admin işlemlerini service role/API route üzerinden çalıştırın; service role anahtarını istemciye göndermeyin.
+-- Admin erişimi yalnızca Freeman hesabına aittir. Bu kontrol veritabanında da uygulanır.
+create or replace function public.tma_is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select lower(coalesce(auth.jwt() ->> 'email', '')) = 'freeman3598@gmail.com';
+$$;
+
+-- Bu dosya mevcutsa tekrar çalıştırılabilsin diye ilgili politikalar yenilenir.
+drop policy if exists "tma_profiles_self" on public.tma_profiles;
+drop policy if exists "tma_orders_self_read" on public.tma_orders;
+drop policy if exists "tma_order_items_self_read" on public.tma_order_items;
+drop policy if exists "tma_comments_approved_read" on public.tma_article_comments;
+drop policy if exists "tma_profiles_admin" on public.tma_profiles;
+drop policy if exists "tma_orders_admin" on public.tma_orders;
+drop policy if exists "tma_order_items_admin" on public.tma_order_items;
+drop policy if exists "tma_comments_admin" on public.tma_article_comments;
+drop policy if exists "tma_comments_self_insert" on public.tma_article_comments;
+drop policy if exists "tma_promo_admin" on public.tma_promo_codes;
+drop policy if exists "tma_grants_admin" on public.tma_membership_grants;
+
+create policy "tma_profiles_self" on public.tma_profiles
+for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create policy "tma_profiles_admin" on public.tma_profiles
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
+
+create policy "tma_orders_self_read" on public.tma_orders
+for select using (auth.uid() = user_id);
+
+create policy "tma_order_items_self_read" on public.tma_order_items
+for select using (exists (select 1 from public.tma_orders o where o.id = order_id and o.user_id = auth.uid()));
+
+create policy "tma_comments_approved_read" on public.tma_article_comments
+for select using (status = 'approved' or auth.uid() = user_id);
+
+create policy "tma_orders_admin" on public.tma_orders
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
+
+create policy "tma_order_items_admin" on public.tma_order_items
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
+
+create policy "tma_comments_admin" on public.tma_article_comments
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
+
+create policy "tma_comments_self_insert" on public.tma_article_comments
+for insert with check (
+  auth.uid() = user_id
+  and not exists (
+    select 1 from public.tma_profiles p
+    where p.user_id = auth.uid() and p.comment_banned = true
+  )
+);
+
+create policy "tma_promo_admin" on public.tma_promo_codes
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
+
+create policy "tma_grants_admin" on public.tma_membership_grants
+for all using (public.tma_is_admin()) with check (public.tma_is_admin());
 
 create or replace function public.tma_next_order_number()
 returns text
