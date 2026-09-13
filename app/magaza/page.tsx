@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Check, ShoppingBag, ShoppingCart } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
@@ -8,15 +8,16 @@ import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
-import { SHOP_PRODUCTS, shopPriceLabel, type ShopProduct } from '@/lib/shop'
+import { useProducts } from '@/components/products-provider'
+import { shopPriceLabel, type ShopProduct } from '@/lib/shop'
 
 function ProductCard({ product }: { product: ShopProduct }) {
   const { lang } = useLanguage()
   const { add } = useCart()
   const [added, setAdded] = useState(false)
 
-  const name = lang === 'tr' ? product.name : product.nameEn
-  const description = lang === 'tr' ? product.description : product.descriptionEn
+  const name = lang === 'tr' ? product.name : product.nameEn || product.name
+  const description = lang === 'tr' ? product.description : product.descriptionEn || product.description
 
   function handleAdd() {
     add(product.id, 1)
@@ -55,6 +56,8 @@ function ProductCard({ product }: { product: ShopProduct }) {
 export default function MagazaPage() {
   const { lang } = useLanguage()
   const { count } = useCart()
+  const { products, categories, loading } = useProducts()
+  const [activeCategory, setActiveCategory] = useState<string>('all')
 
   const t = lang === 'tr'
     ? {
@@ -63,6 +66,10 @@ export default function MagazaPage() {
         intro:
           'Doğal uçucu yağlar, şifalı karışımlar ve bitkisel ürünler. Katkısız, özenle hazırlanmış ürünler kapınıza kadar gelsin.',
         cart: 'Sepeti görüntüle',
+        all: 'Tümü',
+        uncategorized: 'Diğer',
+        empty: 'Şu an mağazada ürün bulunmuyor.',
+        loading: 'Ürünler yükleniyor…',
       }
     : {
         eyebrow: 'Healing goods',
@@ -70,7 +77,27 @@ export default function MagazaPage() {
         intro:
           'Natural essential oils, healing blends and botanical products. Additive-free, carefully prepared goods delivered to your door.',
         cart: 'View cart',
+        all: 'All',
+        uncategorized: 'Other',
+        empty: 'There are no products in the store right now.',
+        loading: 'Loading products…',
       }
+
+  // Only show category chips that actually contain products.
+  const usedCategories = useMemo(() => {
+    const withProducts = new Set(products.map((product) => product.categoryId ?? 'uncategorized'))
+    const ordered = categories.filter((category) => withProducts.has(category.id))
+    const hasUncategorized = products.some((product) => !product.categoryId)
+    return { ordered, hasUncategorized }
+  }, [products, categories])
+
+  const visibleProducts = useMemo(() => {
+    if (activeCategory === 'all') return products
+    if (activeCategory === 'uncategorized') return products.filter((product) => !product.categoryId)
+    return products.filter((product) => product.categoryId === activeCategory)
+  }, [products, activeCategory])
+
+  const showChips = usedCategories.ordered.length > 0
 
   return (
     <main className="min-h-svh bg-background">
@@ -98,13 +125,52 @@ export default function MagazaPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {SHOP_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {showChips ? (
+          <div className="mb-8 flex flex-wrap gap-2">
+            <CategoryChip label={t.all} active={activeCategory === 'all'} onClick={() => setActiveCategory('all')} />
+            {usedCategories.ordered.map((category) => (
+              <CategoryChip
+                key={category.id}
+                label={lang === 'tr' ? category.name : category.nameEn || category.name}
+                active={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+              />
+            ))}
+            {usedCategories.hasUncategorized ? (
+              <CategoryChip label={t.uncategorized} active={activeCategory === 'uncategorized'} onClick={() => setActiveCategory('uncategorized')} />
+            ) : null}
+          </div>
+        ) : null}
+
+        {loading ? (
+          <p className="py-16 text-center font-sans text-sm text-muted-foreground">{t.loading}</p>
+        ) : visibleProducts.length === 0 ? (
+          <p className="py-16 text-center font-sans text-sm text-muted-foreground">{t.empty}</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
       <SiteFooter />
     </main>
+  )
+}
+
+function CategoryChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-4 py-2 font-sans text-xs uppercase tracking-wider transition-colors ${
+        active
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
+      }`}
+    >
+      {label}
+    </button>
   )
 }

@@ -8,7 +8,8 @@ import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
-import { getShopProduct, shopPriceLabel } from '@/lib/shop'
+import { shopPriceLabel } from '@/lib/shop'
+import { useProducts } from '@/components/products-provider'
 import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
 
 const VAT_RATE = 0.2
@@ -20,6 +21,7 @@ type CargoOption = 'cod' | 'prepaid'
 export default function SepetPage() {
   const { lang } = useLanguage()
   const { items, count, subtotalKurus, setQuantity, remove } = useCart()
+  const { getProduct } = useProducts()
   const tr = lang === 'tr'
 
   const [addresses, setAddresses] = useState<ShippingAddress[]>([])
@@ -172,9 +174,9 @@ export default function SepetPage() {
             <div className="flex flex-col gap-8">
               <ul className="flex flex-col gap-4">
                 {items.map((item) => {
-                  const product = getShopProduct(item.id)
+                  const product = getProduct(item.id)
                   if (!product) return null
-                  const name = tr ? product.name : product.nameEn
+                  const name = tr ? product.name : product.nameEn || product.name
                   return (
                     <li key={item.id} className="flex gap-4 rounded-md border border-border bg-card p-4">
                       <img src={product.image || '/placeholder.svg'} alt={name} className="size-20 shrink-0 rounded object-cover" />
