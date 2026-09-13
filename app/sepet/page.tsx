@@ -11,6 +11,7 @@ import { useLanguage } from '@/components/language-provider'
 import { shopPriceLabel } from '@/lib/shop'
 import { useProducts } from '@/components/products-provider'
 import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
+import { createShopOrder } from '@/app/actions/orders'
 
 const VAT_RATE = 0.2
 const SHIPPING_FEE_KURUS = 25000 // 250 TL
@@ -50,16 +51,20 @@ export default function SepetPage() {
     setAddressError(false)
   }
 
-  const handlePay = () => {
+  const handlePay = async () => {
     const noAddress = !selectedAddress || !isShippingComplete(selectedAddress)
     setAddressError(noAddress)
-    if (noAddress) {
+    if (noAddress || !selectedAddress) {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
     if (selectedAddress) setSelectedAddressId(selectedAddress.id)
-    // Payment infrastructure is wired separately; persist selection and proceed.
-    window.location.href = '/odeme'
+    const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress)
+    if (!result.ok) {
+      window.alert(tr ? 'Sipariş oluşturulamadı. Lütfen sepetinizi ve adresinizi kontrol edin.' : 'The order could not be created. Please check your cart and address.')
+      return
+    }
+    window.location.href = `/odeme?order=${encodeURIComponent(result.orderId)}`
   }
 
   const t = tr
