@@ -73,8 +73,16 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
       const membershipRow = membership.find((row) => JSON.stringify(row).toLowerCase().includes('platin'))
         ?? membership.find((row) => JSON.stringify(row).toLowerCase().includes('premium'))
         ?? membership[0]
-      const membershipType = membershipRow ? String(membershipRow.type ?? (platin ? 'platin' : premium ? 'premium' : '')) || null : null
-      const membershipExpiresAt = membershipRow ? parseExpiry(membershipRow.expires_at) : null
+      // Grant-based membership (gift/redeem codes) carries its own expiry.
+      const activeGrant = grants.find((row) => String(row.tier ?? '').toLowerCase() === 'platin')
+        ?? grants.find((row) => String(row.tier ?? '').toLowerCase() === 'premium')
+        ?? grants[0]
+      const membershipType = membershipRow
+        ? String(membershipRow.type ?? (platin ? 'platin' : premium ? 'premium' : '')) || null
+        : activeGrant ? String(activeGrant.tier ?? '') || null : null
+      const membershipExpiresAt = membershipRow
+        ? parseExpiry(membershipRow.expires_at)
+        : activeGrant ? parseExpiry(activeGrant.expires_at) : null
 
       // user_ottoman_unlocks holds per-article original-text unlocks synced from
       // the mobile app: expires_at is epoch-ms (Long.MAX_VALUE = lifetime purchase,

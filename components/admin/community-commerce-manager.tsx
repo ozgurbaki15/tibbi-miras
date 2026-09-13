@@ -43,7 +43,8 @@ export function CommunityCommerceManager() {
     const normalized = grantCode.trim().toUpperCase()
     const days = Number(durationDays)
     if (!normalized || !Number.isInteger(days) || days <= 0) return
-    const { error } = await supabase.from('tma_membership_grants').insert({ code: normalized, user_id: grantUserId.trim() || null, tier: grantTier, duration_days: days, max_uses: grantUserId.trim() ? 1 : 1, active: true })
+    const directUserId = grantUserId.trim() || null
+    const { error } = await supabase.from('tma_membership_grants').insert({ code: normalized, user_id: directUserId, tier: grantTier, duration_days: days, expires_at: directUserId ? new Date(Date.now() + days * 86400000).toISOString() : null, max_uses: 1, active: true })
     setMessage(error ? 'Üyelik kodu oluşturulamadı. Kod benzersiz olmalı ve şemayı uygulamış olmalısınız.' : `${normalized} üyelik kodu oluşturuldu.`)
     if (!error) setGrantCode('')
   }

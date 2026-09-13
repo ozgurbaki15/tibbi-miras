@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus, PackageSearch } from 'lucide-react'
+import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus, PackageSearch, LogOut } from 'lucide-react'
 import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
@@ -121,6 +121,11 @@ export function AccountPanel() {
     ) : null}
 
     <AccountShipping />
+
+    <button onClick={() => void signOut()} className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-4 font-sans text-sm uppercase tracking-wider text-foreground transition-colors hover:border-destructive hover:bg-destructive/10 hover:text-destructive">
+      <LogOut className="size-4" aria-hidden="true" />
+      {tr ? 'Çıkış yap' : 'Sign out'}
+    </button>
     </div>
   )
 }
