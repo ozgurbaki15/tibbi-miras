@@ -103,7 +103,9 @@ export function ProductManager() {
     if (!form.name.trim()) return notify('error', 'Ürün adı gerekli.')
     const priceKurus = Math.round(parseFloat(form.priceTl.replace(',', '.')) * 100)
     if (!Number.isFinite(priceKurus) || priceKurus < 0) return notify('error', 'Geçerli bir fiyat girin.')
-    const maxQuantity = Math.max(1, Math.floor(Number(form.maxQuantity) || 1))
+    const parsedMaxQuantity = Number(form.maxQuantity)
+    if (!Number.isInteger(parsedMaxQuantity) || parsedMaxQuantity <= 0) return notify('error', 'Maksimum adet 1 veya daha büyük bir tam sayı olmalıdır.')
+    const maxQuantity = parsedMaxQuantity
 
     setSaving(true)
     const payload = {

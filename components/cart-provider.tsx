@@ -24,8 +24,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clampQuantity = useCallback(
     (id: string, quantity: number) => {
-      const max = getProduct(id)?.maxQuantity ?? 10
-      return Math.max(0, Math.min(Math.floor(quantity), max))
+      const product = getProduct(id)
+      if (!product || !product.inStock || product.maxQuantity <= 0) return 0
+      return Math.max(0, Math.min(Math.floor(quantity), product.maxQuantity))
     },
     [getProduct],
   )
@@ -69,6 +70,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setItems((prev) => {
         const existing = prev.find((item) => item.id === id)
         const nextQty = clampQuantity(id, (existing?.quantity ?? 0) + quantity)
+        if (nextQty <= 0) return prev
         const next = existing
           ? prev.map((item) => (item.id === id ? { ...item, quantity: nextQty } : item))
           : [...prev, { id, quantity: nextQty }]
