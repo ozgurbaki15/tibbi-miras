@@ -60,7 +60,7 @@ export const UI = {
   tr: {
     eyebrow: 'Freed Science',
     intro:
-      'Botanik levhalardan anatomi gravürlerine, eczacılık terkiplerinden gök cisimlerine uzanan tıp tarihinin nadide el yazmaları ve basılı eserleri. Şifanın binlerce yıllık hafızasını tek bir çatı altında derliyoruz.',
+      'Tıp tarihinin nadide el yazmaları ve basılı eserleri. Şifanın binlerce yıllık hafızasını tek bir çatı altında derliyoruz.',
     collection: 'Koleksiyon',
     countSuffix: 'eser · sürekli genişleyen dijital derlem',
     selection: 'Görsel arşivden seçkiler',
@@ -78,7 +78,7 @@ export const UI = {
   en: {
     eyebrow: 'Freed Science',
     intro:
-      'Rare manuscripts and printed works spanning the history of medicine — from botanical plates and anatomical engravings to apothecary formulas and celestial charts. We gather the millennia-old memory of healing under a single roof.',
+      'Rare manuscripts and printed works spanning the history of medicine. We gather the millennia-old memory of healing under a single roof.',
     collection: 'Collection',
     countSuffix: 'works · a continually growing digital corpus',
     selection: 'Selections from the visual archive',

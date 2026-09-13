@@ -8,6 +8,8 @@ type Entitlements = {
   premium: boolean
   platin: boolean
   loading: boolean
+  membershipType: string | null
+  membershipExpiresAt: number | null
   originalUnlocks: Record<string, number>
   hasOriginalAccess: (articleId: string | number) => boolean
 }
@@ -16,9 +18,21 @@ const EntitlementsContext = createContext<Entitlements>({
   premium: false,
   platin: false,
   loading: true,
+  membershipType: null,
+  membershipExpiresAt: null,
   originalUnlocks: {},
   hasOriginalAccess: () => false,
 })
+
+// user_membership.expires_at may arrive as an ISO date string or epoch ms.
+function parseExpiry(value: unknown): number | null {
+  if (value == null) return null
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  const asNumber = Number(value)
+  if (Number.isFinite(asNumber) && String(value).trim() !== '') return asNumber
+  const parsed = Date.parse(String(value))
+  return Number.isFinite(parsed) ? parsed : null
+}
 
 function rowBelongsToUser(row: Record<string, unknown>, userId: string) {
   return ['user_id', 'profile_id', 'id'].some((key) => String(row[key] ?? '') === userId)
@@ -31,12 +45,12 @@ function rowIsActive(row: Record<string, unknown>) {
 
 export function EntitlementsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
-  const [state, setState] = useState<{ premium: boolean; platin: boolean; loading: boolean; originalUnlocks: Record<string, number> }>({ premium: false, platin: false, loading: true, originalUnlocks: {} })
+  const [state, setState] = useState<{ premium: boolean; platin: boolean; loading: boolean; membershipType: string | null; membershipExpiresAt: number | null; originalUnlocks: Record<string, number> }>({ premium: false, platin: false, loading: true, membershipType: null, membershipExpiresAt: null, originalUnlocks: {} })
 
   useEffect(() => {
     let active = true
     if (!user || !isSupabaseConfigured) {
-      setState({ premium: false, platin: false, loading: false, originalUnlocks: {} })
+      setState({ premium: false, platin: false, loading: false, membershipType: null, membershipExpiresAt: null, originalUnlocks: {} })
       return () => { active = false }
     }
 
@@ -54,6 +68,13 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
         || rowsOf('user_unlocks').filter(rowIsActive).length > 0
       const platin = membership.some((row) => JSON.stringify(row).toLowerCase().includes('platin'))
 
+      // Capture the active membership row so Settings can show type + expiry.
+      const membershipRow = membership.find((row) => JSON.stringify(row).toLowerCase().includes('platin'))
+        ?? membership.find((row) => JSON.stringify(row).toLowerCase().includes('premium'))
+        ?? membership[0]
+      const membershipType = membershipRow ? String(membershipRow.type ?? (platin ? 'platin' : premium ? 'premium' : '')) || null : null
+      const membershipExpiresAt = membershipRow ? parseExpiry(membershipRow.expires_at) : null
+
       // user_ottoman_unlocks holds per-article original-text unlocks synced from
       // the mobile app: expires_at is epoch-ms (Long.MAX_VALUE = lifetime purchase,
       // otherwise a 24h ad unlock).
@@ -65,7 +86,7 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
         originalUnlocks[articleId] = Math.max(originalUnlocks[articleId] ?? 0, expiresAt)
       })
 
-      setState({ premium, platin, loading: false, originalUnlocks })
+      setState({ premium, platin, loading: false, membershipType, membershipExpiresAt, originalUnlocks })
     })
 
     return () => { active = false }
@@ -75,6 +96,8 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
     premium: state.premium,
     platin: state.platin,
     loading: state.loading,
+    membershipType: state.membershipType,
+    membershipExpiresAt: state.membershipExpiresAt,
     originalUnlocks: state.originalUnlocks,
     hasOriginalAccess: (articleId: string | number) => {
       if (state.premium || state.platin) return true
