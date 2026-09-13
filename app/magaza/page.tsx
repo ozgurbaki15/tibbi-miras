@@ -85,11 +85,20 @@ export default function MagazaPage() {
 
   // Only show category chips that actually contain products.
   const usedCategories = useMemo(() => {
-    const withProducts = new Set(products.map((product) => product.categoryId ?? 'uncategorized'))
+    const withProducts = new Set(products.map((product) => product.categoryId).filter(Boolean))
     const ordered = categories.filter((category) => withProducts.has(category.id))
     const hasUncategorized = products.some((product) => !product.categoryId)
     return { ordered, hasUncategorized }
   }, [products, categories])
+
+  const categoryName = (id: string | null) => {
+    const category = categories.find((item) => item.id === id)
+    if (!category) return ''
+    const parent = category.parentId ? categories.find((item) => item.id === category.parentId) : null
+    const name = lang === 'tr' ? category.name : category.nameEn || category.name
+    const parentName = parent ? (lang === 'tr' ? parent.name : parent.nameEn || parent.name) : ''
+    return parentName ? `${parentName} / ${name}` : name
+  }
 
   const visibleProducts = useMemo(() => {
     if (activeCategory === 'all') return products
@@ -131,7 +140,7 @@ export default function MagazaPage() {
             {usedCategories.ordered.map((category) => (
               <CategoryChip
                 key={category.id}
-                label={lang === 'tr' ? category.name : category.nameEn || category.name}
+                label={categoryName(category.id)}
                 active={activeCategory === category.id}
                 onClick={() => setActiveCategory(category.id)}
               />

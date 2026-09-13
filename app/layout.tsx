@@ -4,6 +4,7 @@ import { Cormorant_Garamond, EB_Garamond } from 'next/font/google'
 import { LanguageProvider } from '@/components/language-provider'
 import { AuthProvider } from '@/components/auth-provider'
 import { CartProvider } from '@/components/cart-provider'
+import { CartSidebar } from '@/components/cart-sidebar'
 import { ProductsProvider } from '@/components/products-provider'
 import { EntitlementsProvider } from '@/components/entitlements-provider'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -63,6 +64,7 @@ export default function RootLayout({
               <ProductsProvider>
               <CartProvider>
               <div className="flex-grow">{children}</div>
+              <CartSidebar />
               <footer className="mt-12 w-full border-t border-border/40 bg-background/95 py-6">
                 <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">

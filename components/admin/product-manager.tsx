@@ -54,7 +54,7 @@ export function ProductManager() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
-  const [newCategory, setNewCategory] = useState({ name: '', nameEn: '' })
+  const [newCategory, setNewCategory] = useState({ name: '', nameEn: '', parentId: '' })
   const [categoryBusy, setCategoryBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
@@ -103,7 +103,9 @@ export function ProductManager() {
     if (!form.name.trim()) return notify('error', 'Ürün adı gerekli.')
     const priceKurus = Math.round(parseFloat(form.priceTl.replace(',', '.')) * 100)
     if (!Number.isFinite(priceKurus) || priceKurus < 0) return notify('error', 'Geçerli bir fiyat girin.')
-    const maxQuantity = Math.max(1, Math.floor(Number(form.maxQuantity) || 1))
+    const parsedMaxQuantity = Number(form.maxQuantity)
+    if (!Number.isInteger(parsedMaxQuantity) || parsedMaxQuantity <= 0) return notify('error', 'Maksimum adet 1 veya daha büyük bir tam sayı olmalıdır.')
+    const maxQuantity = parsedMaxQuantity
 
     setSaving(true)
     const payload = {
@@ -158,11 +160,12 @@ export function ProductManager() {
       const { error } = await supabase.from('shop_categories').insert({
         name: newCategory.name.trim(),
         name_en: newCategory.nameEn.trim(),
+        parent_id: newCategory.parentId || null,
         sort_order: categories.length,
       })
       if (error) throw error
       await refresh()
-      setNewCategory({ name: '', nameEn: '' })
+      setNewCategory({ name: '', nameEn: '', parentId: '' })
       notify('ok', 'Kategori eklendi.')
     } catch (err) {
       console.log('[v0] category add error', err)
@@ -207,7 +210,7 @@ export function ProductManager() {
           <ul className="mb-5 flex flex-wrap gap-2">
             {categories.map((category) => (
               <li key={category.id} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5">
-                <span className="font-sans text-sm text-foreground">{category.name}</span>
+                <span className="font-sans text-sm text-foreground">{category.parentId ? '↳ ' : ''}{category.name}{category.parentId ? ` (${categories.find((parent) => parent.id === category.parentId)?.name ?? 'Ana kategori'})` : ''}</span>
                 <button type="button" onClick={() => handleDeleteCategory(category.id, category.name)} aria-label={`${category.name} kategorisini sil`} className="text-muted-foreground transition-colors hover:text-destructive">
                   <X className="size-3.5" />
                 </button>
@@ -217,9 +220,13 @@ export function ProductManager() {
         ) : (
           <p className="mb-5 font-sans text-sm text-muted-foreground">Henüz kategori yok. İsterseniz ürünleri kategorisiz de ekleyebilirsiniz.</p>
         )}
-        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
           <input value={newCategory.name} onChange={(e) => setNewCategory((p) => ({ ...p, name: e.target.value }))} placeholder="Kategori adı (ör. Uçucu Yağlar)" className={inputClass} />
           <input value={newCategory.nameEn} onChange={(e) => setNewCategory((p) => ({ ...p, nameEn: e.target.value }))} placeholder="İngilizce adı (opsiyonel)" className={inputClass} />
+          <select value={newCategory.parentId} onChange={(e) => setNewCategory((p) => ({ ...p, parentId: e.target.value }))} className={inputClass}>
+            <option value="">Ana kategori</option>
+            {categories.filter((category) => !category.parentId).map((category) => <option key={category.id} value={category.id}>{category.name} altında</option>)}
+          </select>
           <button type="button" onClick={handleAddCategory} disabled={categoryBusy} className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 font-sans text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50">
             {categoryBusy ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />} Ekle
           </button>
@@ -304,7 +311,7 @@ export function ProductManager() {
                 <select value={form.categoryId} onChange={(e) => setForm((p) => ({ ...p, categoryId: e.target.value }))} className={inputClass}>
                   <option value="">Diğer / Kategorisiz</option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
+                    <option key={category.id} value={category.id}>{category.parentId ? '↳ ' : ''}{category.name}</option>
                   ))}
                 </select>
               </div>
