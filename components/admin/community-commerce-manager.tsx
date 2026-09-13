@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react'
 import { Check, ShieldBan, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { useAuth } from '@/components/auth-provider'
+import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 
 type PendingComment = { id: string; article_id: string; user_id: string; body: string; created_at: string }
 
 export function CommunityCommerceManager() {
+  const { user } = useAuth()
+  const isAdmin = user?.email?.trim().toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase()
   const [comments, setComments] = useState<PendingComment[]>([])
   const [code, setCode] = useState('')
   const [kind, setKind] = useState<'percent' | 'fixed'>('percent')
@@ -39,6 +43,8 @@ export function CommunityCommerceManager() {
     setMessage(error ? 'Kod oluşturulamadı. Kod benzersiz olmalı ve şemayı uygulamış olmalısınız.' : `${normalized} kodu oluşturuldu.`)
     if (!error) setCode('')
   }
+
+  if (!isAdmin) return null
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-2">
