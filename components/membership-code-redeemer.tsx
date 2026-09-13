@@ -14,9 +14,11 @@ export function MembershipCodeRedeemer() {
     if (!user) return setMessage('Kod kullanmak için giriş yapmalısınız.')
     const normalized = code.trim().toUpperCase()
     if (!normalized) return
-    const { data, error } = await supabase.from('tma_membership_grants').select('id, tier, max_uses, used_count, active, expires_at').eq('code', normalized).eq('active', true).maybeSingle()
+    const { data, error } = await supabase.from('tma_membership_grants').select('id, tier, max_uses, used_count, active, expires_at, duration_days').eq('code', normalized).eq('active', true).maybeSingle()
     if (error || !data || (data.max_uses !== null && data.used_count >= data.max_uses)) return setMessage('Kod geçersiz veya kullanım hakkı kalmamış.')
-    const { error: updateError } = await supabase.from('tma_membership_grants').update({ user_id: user.id, used_count: data.used_count + 1, active: false }).eq('id', data.id).eq('used_count', data.used_count)
+    if (data.expires_at && Date.parse(data.expires_at) < Date.now()) return setMessage('Kodun süresi dolmuş.')
+    const effectiveExpiry = data.expires_at ?? (data.duration_days ? new Date(Date.now() + data.duration_days * 86400000).toISOString() : null)
+    const { error: updateError } = await supabase.from('tma_membership_grants').update({ user_id: user.id, used_count: data.used_count + 1, expires_at: effectiveExpiry }).eq('id', data.id).eq('used_count', data.used_count)
     if (updateError) return setMessage('Kod kullanılamadı. Lütfen tekrar deneyin.')
     setCode('')
     setMessage(`${data.tier === 'platin' ? 'Platin' : 'Premium'} üyeliğiniz tanımlandı. Sayfayı yenileyin.`)

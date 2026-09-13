@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus, PackageSearch } from 'lucide-react'
+import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus, PackageSearch, LogOut } from 'lucide-react'
 import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
@@ -41,7 +41,7 @@ export function AccountPanel() {
   const tier = platin ? 'PLATİN' : premium ? 'PREMİUM' : (tr ? 'ÜYE' : 'MEMBER')
   const TierIcon = platin ? ShieldCheck : premium ? Crown : UserRound
   const isMember = premium || platin
-  const isLifetime = isMember && (membershipExpiresAt == null || membershipExpiresAt > LIFETIME_THRESHOLD)
+  const isLifetime = isMember && membershipExpiresAt != null && membershipExpiresAt > LIFETIME_THRESHOLD
   const expiryDate = formatDate(membershipExpiresAt, lang)
   const daysLeft = membershipExpiresAt != null && !isLifetime ? Math.max(0, Math.ceil((membershipExpiresAt - Date.now()) / 86400000)) : null
   const registered = formatDate(user.created_at, lang)
@@ -86,7 +86,7 @@ export function AccountPanel() {
                   ? (tr ? 'Ömür boyu' : 'Lifetime')
                   : expiryDate
                     ? (tr ? `${expiryDate}${daysLeft != null ? ` · ${daysLeft} gün kaldı` : ''}` : `${expiryDate}${daysLeft != null ? ` · ${daysLeft} days left` : ''}`)
-                    : (tr ? 'Aktif' : 'Active')}
+                    : (tr ? 'Ömür boyu' : 'Lifetime')}
               </dd>
             </div>
           </div>
@@ -121,6 +121,11 @@ export function AccountPanel() {
     ) : null}
 
     <AccountShipping />
+
+    <button onClick={() => void signOut()} className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-4 font-sans text-sm uppercase tracking-wider text-foreground transition-colors hover:border-destructive hover:bg-destructive/10 hover:text-destructive">
+      <LogOut className="size-4" aria-hidden="true" />
+      {tr ? 'Çıkış yap' : 'Sign out'}
+    </button>
     </div>
   )
 }
