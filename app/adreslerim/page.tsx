@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { MapPin, Plus, Trash2, Check, Pencil, X } from 'lucide-react'
@@ -12,7 +12,7 @@ import { useLanguage } from '@/components/language-provider'
 import { loadAddresses, saveAddresses, newAddress, shippingErrors, type ShippingAddress, type ShippingInfo } from '@/lib/shipping'
 import { updateOrderContact } from '@/app/actions/orders'
 
-export default function AdreslerimPage() {
+function AdreslerimContent() {
   const { lang } = useLanguage()
   const tr = lang === 'tr'
   const searchParams = useSearchParams()
@@ -168,5 +168,13 @@ export default function AdreslerimPage() {
       </section>
       <SiteFooter />
     </main>
+  )
+}
+
+export default function AdreslerimPage() {
+  return (
+    <Suspense fallback={<main className="min-h-svh bg-background" aria-busy="true" />}>
+      <AdreslerimContent />
+    </Suspense>
   )
 }
