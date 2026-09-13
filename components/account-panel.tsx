@@ -102,7 +102,7 @@ export function AccountPanel() {
       ) : null}
     </section>
 
-    {user.email?.toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase() ? (
+    {user.email?.trim().toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase() ? (
       <Link href="/yonetim" className="flex items-center gap-4 rounded-md border border-primary/40 bg-card p-6 transition-colors hover:border-primary">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/70"><PackageSearch className="size-5 text-primary" aria-hidden="true" /></span>
         <span className="flex flex-col">

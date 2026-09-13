@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Crown, LogIn, LogOut, ShieldCheck, UserRound } from 'lucide-react'
+import { Crown, LogIn, LogOut, ShieldCheck, UserRound, PackageSearch } from 'lucide-react'
 import { useAuth } from '@/components/auth-provider'
+import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { useEntitlements } from '@/components/entitlements-provider'
 
 export function AccountMenu() {
@@ -27,6 +28,7 @@ export function AccountMenu() {
 
   const tier = platin ? 'PLATİN' : premium ? 'PREMİUM' : 'ÜYE'
   const TierIcon = platin ? ShieldCheck : premium ? Crown : UserRound
+  const isShopAdmin = user.email?.trim().toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase()
   const tierClass = platin
     ? 'border-sky-300/70 bg-sky-300/10 text-sky-200 shadow-[0_0_18px_rgba(125,211,252,0.18)]'
     : premium
@@ -35,6 +37,16 @@ export function AccountMenu() {
 
   return (
     <div className="flex items-center gap-2">
+      {isShopAdmin ? (
+        <Link
+          href="/yonetim"
+          title="Ürün yönetimi"
+          aria-label="Ürün yönetimi"
+          className="inline-flex size-9 items-center justify-center rounded-full border border-primary/60 bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+        >
+          <PackageSearch className="size-4" aria-hidden="true" />
+        </Link>
+      ) : null}
       <Link
         href="/settings"
         title="Hesap ve üyelik ayarları"
