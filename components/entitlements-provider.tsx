@@ -54,7 +54,7 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
       return () => { active = false }
     }
 
-    Promise.all(['user_membership', 'user_premium_unlocks', 'user_ottoman_unlocks', 'user_unlocks'].map(async (table) => {
+    Promise.all(['user_membership', 'user_premium_unlocks', 'user_ottoman_unlocks', 'user_unlocks', 'tma_membership_grants'].map(async (table) => {
       const { data, error } = await supabase.from(table).select('*').limit(500)
       if (error) console.log('[v0] entitlement fetch error', table, error.message)
       return { table, rows: (data ?? []).filter((row) => rowBelongsToUser(row as Record<string, unknown>, user.id)) as Record<string, unknown>[] }
@@ -62,11 +62,12 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
       if (!active) return
       const rowsOf = (table: string) => results.find((result) => result.table === table)?.rows ?? []
       const membership = rowsOf('user_membership').filter(rowIsActive)
-      const premium = membership.some((row) => JSON.stringify(row).toLowerCase().includes('premium'))
+      const grants = rowsOf('tma_membership_grants').filter((row) => rowIsActive(row) && (row.active ?? true) && (!row.expires_at || parseExpiry(row.expires_at)! > Date.now()))
+      const premium = grants.some((row) => String(row.tier ?? '').toLowerCase() === 'premium') || grants.some((row) => String(row.tier ?? '').toLowerCase() === 'platin') || membership.some((row) => JSON.stringify(row).toLowerCase().includes('premium'))
         || membership.some((row) => JSON.stringify(row).toLowerCase().includes('platin'))
         || rowsOf('user_premium_unlocks').filter(rowIsActive).length > 0
         || rowsOf('user_unlocks').filter(rowIsActive).length > 0
-      const platin = membership.some((row) => JSON.stringify(row).toLowerCase().includes('platin'))
+      const platin = grants.some((row) => String(row.tier ?? '').toLowerCase() === 'platin') || membership.some((row) => JSON.stringify(row).toLowerCase().includes('platin'))
 
       // Capture the active membership row so Settings can show type + expiry.
       const membershipRow = membership.find((row) => JSON.stringify(row).toLowerCase().includes('platin'))

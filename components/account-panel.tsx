@@ -102,6 +102,14 @@ export function AccountPanel() {
       ) : null}
     </section>
 
+    <Link href="/siparislerim" className="flex items-center gap-4 rounded-md border border-border bg-card p-6 transition-colors hover:border-primary">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-background/70"><PackageSearch className="size-5 text-primary" aria-hidden="true" /></span>
+      <span className="flex flex-col">
+        <span className="font-serif text-lg text-card-foreground">{tr ? 'Siparişlerim' : 'My orders'}</span>
+        <span className="font-sans text-sm text-muted-foreground">{tr ? 'Sipariş numaralarınızı ve teslimat durumunu görün.' : 'View your order numbers and delivery status.'}</span>
+      </span>
+    </Link>
+
     {user.email?.trim().toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase() ? (
       <Link href="/yonetim" className="flex items-center gap-4 rounded-md border border-primary/40 bg-card p-6 transition-colors hover:border-primary">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/70"><PackageSearch className="size-5 text-primary" aria-hidden="true" /></span>

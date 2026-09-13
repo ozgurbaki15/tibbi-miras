@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Minus, Plus, ShoppingCart, Trash2, Truck, PackageCheck, X, MapPin } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, Truck, PackageCheck, MapPin } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
@@ -11,12 +11,12 @@ import { useLanguage } from '@/components/language-provider'
 import { shopPriceLabel } from '@/lib/shop'
 import { useProducts } from '@/components/products-provider'
 import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
+import { createShopOrder } from '@/app/actions/orders'
+import { supabase } from '@/lib/supabase/client'
 
 const VAT_RATE = 0.2
 const SHIPPING_FEE_KURUS = 25000 // 250 TL
-const HIDE_COD_NOTICE_KEY = 'tma-hide-cod-notice'
-
-type CargoOption = 'cod' | 'prepaid'
+const FREE_SHIPPING_THRESHOLD_KURUS = 300000
 
 export default function SepetPage() {
   const { lang } = useLanguage()
@@ -27,9 +27,9 @@ export default function SepetPage() {
   const [addresses, setAddresses] = useState<ShippingAddress[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [addressError, setAddressError] = useState(false)
-  const [cargoOption, setCargoOption] = useState<CargoOption | null>(null)
-  const [cargoError, setCargoError] = useState(false)
-  const [codNoticeOpen, setCodNoticeOpen] = useState(false)
+  const [promoCode, setPromoCode] = useState('')
+  const [promoMessage, setPromoMessage] = useState('')
+  const [discountKurus, setDiscountKurus] = useState(0)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -42,28 +42,29 @@ export default function SepetPage() {
 
   const selectedAddress = addresses.find((a) => a.id === selectedId) ?? null
 
-  const shippingFeeKurus = cargoOption === 'prepaid' ? SHIPPING_FEE_KURUS : 0
-  const grandTotalKurus = subtotalKurus + shippingFeeKurus
+  const shippingFeeKurus = subtotalKurus >= FREE_SHIPPING_THRESHOLD_KURUS ? 0 : SHIPPING_FEE_KURUS
+  const discountedSubtotalKurus = Math.max(0, subtotalKurus - discountKurus)
+  const grandTotalKurus = discountedSubtotalKurus + shippingFeeKurus
+
+  const applyPromo = async () => {
+    const normalized = promoCode.trim().toUpperCase()
+    if (!normalized) return
+    const { data, error } = await supabase.from('tma_promo_codes').select('kind, value, active, starts_at, ends_at').eq('code', normalized).eq('active', true).maybeSingle()
+    const now = Date.now()
+    const valid = !error && data && (!data.starts_at || new Date(data.starts_at).getTime() <= now) && (!data.ends_at || new Date(data.ends_at).getTime() >= now)
+    if (!valid) {
+      setDiscountKurus(0)
+      setPromoMessage(tr ? 'İndirim kodu geçersiz veya süresi dolmuş.' : 'This promo code is invalid or expired.')
+      return
+    }
+    const discount = data.kind === 'percent' ? Math.min(subtotalKurus, Math.floor(subtotalKurus * Math.min(100, data.value) / 100)) : Math.min(subtotalKurus, data.value * 100)
+    setDiscountKurus(discount)
+    setPromoMessage(tr ? 'İndirim kodu uygulandı.' : 'Promo code applied.')
+  }
 
   // Product prices are VAT-inclusive; break the product subtotal down for display.
   const netKurus = Math.round(subtotalKurus / (1 + VAT_RATE))
   const vatKurus = subtotalKurus - netKurus
-
-  const selectCargo = (option: CargoOption) => {
-    setCargoOption(option)
-    setCargoError(false)
-    if (option === 'cod') {
-      const hidden = typeof window !== 'undefined' && window.localStorage.getItem(HIDE_COD_NOTICE_KEY) === '1'
-      if (!hidden) setCodNoticeOpen(true)
-    }
-  }
-
-  const closeCodNotice = (dontShowAgain: boolean) => {
-    if (dontShowAgain && typeof window !== 'undefined') {
-      window.localStorage.setItem(HIDE_COD_NOTICE_KEY, '1')
-    }
-    setCodNoticeOpen(false)
-  }
 
   const selectAddress = (id: string) => {
     setSelectedId(id)
@@ -71,18 +72,20 @@ export default function SepetPage() {
     setAddressError(false)
   }
 
-  const handlePay = () => {
+  const handlePay = async () => {
     const noAddress = !selectedAddress || !isShippingComplete(selectedAddress)
     setAddressError(noAddress)
-    const noCargo = cargoOption === null
-    setCargoError(noCargo)
-    if (noAddress || noCargo) {
+    if (noAddress || !selectedAddress) {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
     if (selectedAddress) setSelectedAddressId(selectedAddress.id)
-    // Payment infrastructure is wired separately; persist selection and proceed.
-    window.location.href = '/odeme'
+    const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress, promoCode)
+    if (!result.ok) {
+      window.alert(tr ? 'Sipariş oluşturulamadı. Lütfen sepetinizi ve adresinizi kontrol edin.' : 'The order could not be created. Please check your cart and address.')
+      return
+    }
+    window.location.href = `/odeme?order=${encodeURIComponent(result.orderId)}`
   }
 
   const t = tr
@@ -94,10 +97,10 @@ export default function SepetPage() {
         subtotal: 'Ara toplam (KDV hariç)',
         vat: 'KDV (%20)',
         shipping: 'Kargo',
-        shippingCod: 'Kapıda ödenir',
+        shippingFree: 'Ücretsiz',
         total: 'Genel toplam',
         pay: 'Ödemeye geç',
-        note: 'Ürün fiyatlarına KDV dahildir. Ürün ücreti internet üzerinden güvenli altyapı ile alınır.',
+        note: 'Ürün fiyatlarına KDV dahildir. Ödeme yalnızca güvenli online ödeme ile alınır.',
         remove: 'Kaldır',
         deliveryTitle: 'Teslimat Bilgileri',
         chooseAddress: 'Kayıtlı adreslerinizden birini seçin:',
@@ -106,17 +109,7 @@ export default function SepetPage() {
         manageAddresses: 'Adreslerimi yönet',
         addressRequired: 'Lütfen bir teslimat adresi seçin.',
         cargoTitle: 'Kargo Ücreti',
-        cargoHint: 'Kargo ücretini nasıl ödemek istersiniz?',
-        codLabel: 'Kapıda ödeme',
-        codDesc: 'Kargo ücretini teslimatta kargo firmasına ödersiniz.',
-        prepaidLabel: 'Kargo ücretini şimdi ödeyeceğim',
-        prepaidDesc: '250 TL kargo ücreti sepete eklenir.',
-        cargoRequired: 'Lütfen bir kargo ödeme seçeneği seçin.',
-        codNotice:
-          'Kapıda ödeme seçeneği sadece kargo ücreti hakkındadır. Ürün ücreti internet üzerinden alınır. Kargo firmasının yansıtacağı fiyat bizim bilgimiz ve kontrolümüz dahilinde değildir.',
-        ok: 'Tamam',
-        dontShow: 'Bir daha gösterme',
-        noticeTitle: 'Kapıda Ödeme Hakkında',
+        cargoHint: '3.000 TL ve üzeri alışverişlerde kargo ücretsizdir.',
       }
     : {
         eyebrow: 'Order summary',
@@ -126,10 +119,10 @@ export default function SepetPage() {
         subtotal: 'Subtotal (excl. VAT)',
         vat: 'VAT (20%)',
         shipping: 'Shipping',
-        shippingCod: 'Paid on delivery',
+        shippingFree: 'Free',
         total: 'Grand total',
         pay: 'Proceed to payment',
-        note: 'Product prices include VAT. The product fee is collected online via secure infrastructure.',
+        note: 'Product prices include VAT. Payment is collected securely online only.',
         remove: 'Remove',
         deliveryTitle: 'Delivery Details',
         chooseAddress: 'Choose one of your saved addresses:',
@@ -138,17 +131,7 @@ export default function SepetPage() {
         manageAddresses: 'Manage addresses',
         addressRequired: 'Please select a delivery address.',
         cargoTitle: 'Shipping Fee',
-        cargoHint: 'How would you like to pay the shipping fee?',
-        codLabel: 'Cash on delivery',
-        codDesc: 'You pay the shipping fee to the courier upon delivery.',
-        prepaidLabel: 'I will pay the shipping fee now',
-        prepaidDesc: 'A 250 TL shipping fee is added to the cart.',
-        cargoRequired: 'Please choose a shipping payment option.',
-        codNotice:
-          'Cash on delivery applies only to the shipping fee. The product fee is collected online. The price charged by the courier is beyond our knowledge and control.',
-        ok: 'OK',
-        dontShow: "Don't show again",
-        noticeTitle: 'About Cash on Delivery',
+        cargoHint: 'Shipping is free for orders of 3,000 TL or more.',
       }
 
   return (
@@ -252,33 +235,15 @@ export default function SepetPage() {
               </div>
 
               <div className="rounded-md border border-border bg-card p-6">
-                <div className="mb-1 flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5">
                   <PackageCheck className="size-5 text-primary" aria-hidden="true" />
                   <h2 className="font-serif text-xl text-card-foreground">{t.cargoTitle}</h2>
                 </div>
-                <p className="mb-4 font-sans text-sm text-muted-foreground">{t.cargoHint}</p>
-                <div className="flex flex-col gap-3">
-                  {(['cod', 'prepaid'] as CargoOption[]).map((option) => {
-                    const active = cargoOption === option
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => selectCargo(option)}
-                        className={`flex items-start gap-3 rounded-md border p-4 text-left transition-colors ${active ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
-                      >
-                        <span className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border ${active ? 'border-primary' : 'border-muted-foreground'}`}>
-                          {active ? <span className="size-2.5 rounded-full bg-primary" /> : null}
-                        </span>
-                        <span className="flex flex-col gap-0.5">
-                          <span className="font-sans text-sm font-medium text-card-foreground">{option === 'cod' ? t.codLabel : t.prepaidLabel}</span>
-                          <span className="font-sans text-xs text-muted-foreground">{option === 'cod' ? t.codDesc : t.prepaidDesc}</span>
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-                {cargoError ? <p className="mt-3 font-sans text-xs text-destructive">{t.cargoRequired}</p> : null}
+                <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
+                  {subtotalKurus >= FREE_SHIPPING_THRESHOLD_KURUS
+                    ? (tr ? '3.000 TL ve üzeri alışverişlerde kargo ücretsizdir.' : 'Shipping is free for orders of 3,000 TL or more.')
+                    : (tr ? `3.000 TL üzeri alışverişlerde kargo ücretsizdir. Mevcut kargo: ${shopPriceLabel(SHIPPING_FEE_KURUS, lang)}.` : `Shipping is free for orders of 3,000 TL or more. Current shipping: ${shopPriceLabel(SHIPPING_FEE_KURUS, lang)}.`)}
+                </p>
               </div>
             </div>
 
@@ -292,15 +257,21 @@ export default function SepetPage() {
                   <dt>{t.vat}</dt>
                   <dd>{shopPriceLabel(vatKurus, lang)}</dd>
                 </div>
+                {discountKurus > 0 ? <div className="flex items-center justify-between text-primary"><dt>{tr ? 'İndirim' : 'Discount'}</dt><dd>-{shopPriceLabel(discountKurus, lang)}</dd></div> : null}
                 <div className="flex items-center justify-between text-muted-foreground">
                   <dt>{t.shipping}</dt>
-                  <dd>{cargoOption === 'prepaid' ? shopPriceLabel(SHIPPING_FEE_KURUS, lang) : cargoOption === 'cod' ? t.shippingCod : '—'}</dd>
+                  <dd>{shippingFeeKurus === 0 ? t.shippingFree : shopPriceLabel(shippingFeeKurus, lang)}</dd>
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-border pt-3 font-serif text-lg font-semibold text-foreground">
                   <dt>{t.total}</dt>
                   <dd>{shopPriceLabel(grandTotalKurus, lang)}</dd>
                 </div>
               </dl>
+              <div className="mt-6 border-t border-border pt-5">
+                <label htmlFor="promo-code" className="font-sans text-xs uppercase tracking-wider text-muted-foreground">{tr ? 'İndirim kodu' : 'Promo code'}</label>
+                <div className="mt-2 flex gap-2"><input id="promo-code" value={promoCode} onChange={(event) => setPromoCode(event.target.value)} className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 font-sans text-sm uppercase outline-none focus:border-primary" placeholder={tr ? 'KODUNUZ' : 'YOUR CODE'} /><button type="button" onClick={() => void applyPromo()} className="rounded-md border border-primary px-3 py-2 font-sans text-xs text-primary">{tr ? 'Uygula' : 'Apply'}</button></div>
+                {promoMessage ? <p className="mt-2 font-sans text-xs text-muted-foreground">{promoMessage}</p> : null}
+              </div>
               <button type="button" onClick={handlePay} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 font-sans text-sm font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90">
                 {t.pay}
               </button>
@@ -311,26 +282,6 @@ export default function SepetPage() {
       </section>
       <SiteFooter />
 
-      {codNoticeOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-foreground/50" onClick={() => closeCodNotice(false)} aria-hidden="true" />
-          <div role="dialog" aria-modal="true" aria-label={t.noticeTitle} className="relative w-full max-w-md rounded-md border border-border bg-card p-6 shadow-lg">
-            <button type="button" onClick={() => closeCodNotice(false)} aria-label={tr ? 'Kapat' : 'Close'} className="absolute right-4 top-4 text-muted-foreground hover:text-foreground">
-              <X className="size-5" />
-            </button>
-            <h3 className="mb-3 pr-6 font-serif text-xl text-card-foreground">{t.noticeTitle}</h3>
-            <p className="font-sans text-sm leading-relaxed text-muted-foreground">{t.codNotice}</p>
-            <div className="mt-6 flex flex-col gap-3">
-              <button type="button" onClick={() => closeCodNotice(false)} className="inline-flex w-full items-center justify-center rounded-md bg-primary px-6 py-3 font-sans text-sm font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90">
-                {t.ok}
-              </button>
-              <button type="button" onClick={() => closeCodNotice(true)} className="font-sans text-xs uppercase tracking-wider text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
-                {t.dontShow}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </main>
   )
 }

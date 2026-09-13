@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { MapPin, Plus, Trash2, Check, Pencil, X } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
@@ -9,10 +10,13 @@ import { SiteFooter } from '@/components/site-footer'
 import { ShippingFields } from '@/components/shipping-fields'
 import { useLanguage } from '@/components/language-provider'
 import { loadAddresses, saveAddresses, newAddress, shippingErrors, type ShippingAddress, type ShippingInfo } from '@/lib/shipping'
+import { updateOrderContact } from '@/app/actions/orders'
 
 export default function AdreslerimPage() {
   const { lang } = useLanguage()
   const tr = lang === 'tr'
+  const searchParams = useSearchParams()
+  const orderId = searchParams.get('order')
 
   const [addresses, setAddresses] = useState<ShippingAddress[]>([])
   const [editing, setEditing] = useState<ShippingAddress | null>(null)
@@ -47,7 +51,7 @@ export default function AdreslerimPage() {
     setLabelError(false)
   }
 
-  const saveEditing = () => {
+  const saveEditing = async () => {
     if (!editing) return
     const noLabel = !editing.label.trim()
     const fieldErrors = shippingErrors(editing)
@@ -58,6 +62,10 @@ export default function AdreslerimPage() {
     const exists = addresses.some((a) => a.id === editing.id)
     const next = exists ? addresses.map((a) => (a.id === editing.id ? editing : a)) : [...addresses, editing]
     persist(next)
+    if (orderId) {
+      const result = await updateOrderContact(orderId, editing)
+      if (!result.ok) return
+    }
     setEditing(null)
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 2500)
