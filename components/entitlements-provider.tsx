@@ -34,6 +34,33 @@ function parseExpiry(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+// The membership row synced from the mobile app may store the end date under
+// any of several column names. Scan the known candidates first, then fall back
+// to any date-like field on the row so a real expiry is never shown as unknown.
+const EXPIRY_KEYS = [
+  'expires_at', 'expiresAt', 'expiry', 'expiry_date', 'expiryDate',
+  'expire_at', 'expiration', 'expiration_date', 'end_date', 'endDate',
+  'end_at', 'valid_until', 'validUntil', 'until', 'ends_at', 'endsAt',
+]
+
+function extractExpiry(row: Record<string, unknown>): number | null {
+  for (const key of EXPIRY_KEYS) {
+    if (row[key] != null && String(row[key]).trim() !== '') {
+      const parsed = parseExpiry(row[key])
+      if (parsed != null) return parsed
+    }
+  }
+  // Fallback: any field whose name hints at a date and parses to a timestamp.
+  for (const [key, value] of Object.entries(row)) {
+    if (value == null) continue
+    const lowered = key.toLowerCase()
+    if (!/(expir|end|valid|until|due)/.test(lowered)) continue
+    const parsed = parseExpiry(value)
+    if (parsed != null) return parsed
+  }
+  return null
+}
+
 function rowBelongsToUser(row: Record<string, unknown>, userId: string) {
   return ['user_id', 'profile_id', 'id'].some((key) => String(row[key] ?? '') === userId)
 }
@@ -86,7 +113,7 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
       // so subscriptions and ad-unlocks can't masquerade as lifetime.
       const LIFETIME_SENTINEL = 32503680000000 // 3000-01-01
       const membershipExpiresAt = membershipRow
-        ? parseExpiry(membershipRow.expires_at)
+        ? extractExpiry(membershipRow)
         : activeGrant
           ? (activeGrant.expires_at ? parseExpiry(activeGrant.expires_at) : LIFETIME_SENTINEL)
           : null

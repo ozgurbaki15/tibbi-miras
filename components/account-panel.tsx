@@ -86,7 +86,7 @@ export function AccountPanel() {
                   ? (tr ? 'Ömür boyu' : 'Lifetime')
                   : expiryDate
                     ? (tr ? `${expiryDate}${daysLeft != null ? ` · ${daysLeft} gün kaldı` : ''}` : `${expiryDate}${daysLeft != null ? ` · ${daysLeft} days left` : ''}`)
-                    : (tr ? 'Aktif' : 'Active')}
+                    : (tr ? 'Ömür boyu' : 'Lifetime')}
               </dd>
             </div>
           </div>
