@@ -83,17 +83,7 @@ export default function SepetPage() {
         manageAddresses: 'Adreslerimi yönet',
         addressRequired: 'Lütfen bir teslimat adresi seçin.',
         cargoTitle: 'Kargo Ücreti',
-        cargoHint: 'Kargo ücretini nasıl ödemek istersiniz?',
-        codLabel: 'Kapıda ödeme',
-        codDesc: 'Kargo ücretini teslimatta kargo firmasına ödersiniz.',
-        prepaidLabel: 'Kargo ücretini şimdi ödeyeceğim',
-        prepaidDesc: '250 TL kargo ücreti sepete eklenir.',
-        cargoRequired: 'Lütfen bir kargo ödeme seçeneği seçin.',
-        codNotice:
-          'Kapıda ödeme seçeneği sadece kargo ücreti hakkındadır. Ürün ücreti internet üzerinden alınır. Kargo firmasının yansıtacağı fiyat bizim bilgimiz ve kontrolümüz dahilinde değildir.',
-        ok: 'Tamam',
-        dontShow: 'Bir daha gösterme',
-        noticeTitle: 'Kapıda Ödeme Hakkında',
+        cargoHint: '3.000 TL ve üzeri alışverişlerde kargo ücretsizdir.',
       }
     : {
         eyebrow: 'Order summary',
@@ -115,17 +105,7 @@ export default function SepetPage() {
         manageAddresses: 'Manage addresses',
         addressRequired: 'Please select a delivery address.',
         cargoTitle: 'Shipping Fee',
-        cargoHint: 'How would you like to pay the shipping fee?',
-        codLabel: 'Cash on delivery',
-        codDesc: 'You pay the shipping fee to the courier upon delivery.',
-        prepaidLabel: 'I will pay the shipping fee now',
-        prepaidDesc: 'A 250 TL shipping fee is added to the cart.',
-        cargoRequired: 'Please choose a shipping payment option.',
-        codNotice:
-          'Cash on delivery applies only to the shipping fee. The product fee is collected online. The price charged by the courier is beyond our knowledge and control.',
-        ok: 'OK',
-        dontShow: "Don't show again",
-        noticeTitle: 'About Cash on Delivery',
+        cargoHint: 'Shipping is free for orders of 3,000 TL or more.',
       }
 
   return (

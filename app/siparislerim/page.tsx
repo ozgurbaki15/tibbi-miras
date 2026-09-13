@@ -83,7 +83,14 @@ export default function OrdersPage() {
                   </div>
                   {warnings ? (
                     <div className="mt-4 flex flex-col gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4">
-                      <div className="flex items-start gap-2 text-sm text-destructive"><AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><span>{tr ? 'Sipariş bilgilerinizde düzeltme gerekiyor.' : 'Your order information needs correction.'}</span></div>
+                      <div className="flex items-start gap-2 text-sm text-destructive">
+                        <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                        <span className="flex flex-col gap-1">
+                          <span>{tr ? 'Sipariş bilgilerinizde düzeltme gerekiyor.' : 'Your order information needs correction.'}</span>
+                          {order.phone_warning ? <span>{tr ? 'Telefon numaranız yanlış görünüyor.' : 'Your phone number appears to be incorrect.'}</span> : null}
+                          {order.address_warning ? <span>{tr ? 'Teslimat adresiniz yanlış görünüyor.' : 'Your delivery address appears to be incorrect.'}</span> : null}
+                        </span>
+                      </div>
                       <Link href="/adreslerim" className="text-xs font-medium uppercase tracking-wider text-destructive underline underline-offset-4">{tr ? 'Telefon/adres bilgilerimi değiştir' : 'Change phone/address'}</Link>
                     </div>
                   ) : null}
