@@ -8,6 +8,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { useAuth } from '@/components/auth-provider'
 import { ProductManager } from '@/components/admin/product-manager'
 import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
+import { CommunityCommerceManager } from '@/components/admin/community-commerce-manager'
 
 export default function YonetimPage() {
   const { user, loading } = useAuth()
@@ -49,6 +50,7 @@ export default function YonetimPage() {
               Buradan yeni ürün ekleyebilir; mevcut ürünlerin fotoğrafını, bilgilerini, fiyatını ve kategorisini değiştirebilirsiniz. Değişiklikler anında mağazada görünür.
             </p>
             <ProductManager />
+            <CommunityCommerceManager />
           </>
         )}
       </section>
