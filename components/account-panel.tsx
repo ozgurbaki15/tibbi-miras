@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus } from 'lucide-react'
+import { Crown, ShieldCheck, UserRound, CalendarClock, Mail, CalendarPlus, PackageSearch } from 'lucide-react'
+import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
 import { useLanguage } from '@/components/language-provider'
@@ -96,10 +97,20 @@ export function AccountPanel() {
         <div className="border-t border-border p-6">
           <h3 className="font-serif text-xl text-card-foreground">{isMember ? (tr ? 'Üyeliğini yükselt' : 'Upgrade your membership') : (tr ? 'Üyelik planları' : 'Membership plans')}</h3>
           <p className="mb-5 mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{tr ? 'Tarihî arşivin genişletilmiş metinlerine ve özel eserlere erişin. Uygulamada satın aldığınız üyelik burada da geçerlidir.' : 'Unlock extended texts and exclusive works. Memberships purchased in the app also work here.'}</p>
-          <MembershipPlans premium={premium} platin={platin} isPremiumLifetime={premium && isLifetime} isPlatinLifetime={platin && isLifetime} />
+          <MembershipPlans premium={premium} platin={platin} isPremiumLifetime={premium && isLifetime} isPlatinLifetime={platin && isLifetime} expiresAt={isLifetime ? null : membershipExpiresAt} />
         </div>
       ) : null}
     </section>
+
+    {user.email?.toLowerCase() === SHOP_ADMIN_EMAIL.toLowerCase() ? (
+      <Link href="/yonetim" className="flex items-center gap-4 rounded-md border border-primary/40 bg-card p-6 transition-colors hover:border-primary">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background/70"><PackageSearch className="size-5 text-primary" aria-hidden="true" /></span>
+        <span className="flex flex-col">
+          <span className="font-serif text-lg text-card-foreground">{tr ? 'Ürün Yönetimi' : 'Product Management'}</span>
+          <span className="font-sans text-sm text-muted-foreground">{tr ? 'Ürün ekleyin, düzenleyin ve kategorileri yönetin.' : 'Add, edit products and manage categories.'}</span>
+        </span>
+      </Link>
+    ) : null}
 
     <AccountShipping />
     </div>

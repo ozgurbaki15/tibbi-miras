@@ -1,33 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Truck, Check } from 'lucide-react'
+import Link from 'next/link'
+import { Truck, MapPin, ChevronRight } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
-import { ShippingFields } from '@/components/shipping-fields'
-import { EMPTY_SHIPPING, loadShipping, saveShipping, shippingErrors, type ShippingInfo } from '@/lib/shipping'
+import { loadAddresses, type ShippingAddress } from '@/lib/shipping'
 
 export function AccountShipping() {
   const { lang } = useLanguage()
   const tr = lang === 'tr'
-  const [info, setInfo] = useState<ShippingInfo>(EMPTY_SHIPPING)
-  const [errors, setErrors] = useState<Partial<Record<keyof ShippingInfo, boolean>>>({})
-  const [saved, setSaved] = useState(false)
+  const [addresses, setAddresses] = useState<ShippingAddress[]>([])
 
   useEffect(() => {
-    setInfo(loadShipping())
+    setAddresses(loadAddresses())
   }, [])
-
-  const handleSave = () => {
-    const nextErrors = shippingErrors(info)
-    setErrors(nextErrors)
-    if (Object.keys(nextErrors).length > 0) {
-      setSaved(false)
-      return
-    }
-    saveShipping(info)
-    setSaved(true)
-    window.setTimeout(() => setSaved(false), 2500)
-  }
 
   return (
     <section className="overflow-hidden rounded-md border border-border bg-card">
@@ -37,27 +23,33 @@ export function AccountShipping() {
         </span>
         <div>
           <h2 className="font-serif text-2xl text-card-foreground">{tr ? 'Kargo Bilgilerim' : 'Shipping Details'}</h2>
-          <p className="mt-0.5 font-sans text-xs text-muted-foreground">{tr ? 'Fiziksel ürün siparişleri bu bilgilerle gönderilir.' : 'Physical product orders are shipped using these details.'}</p>
+          <p className="mt-0.5 font-sans text-xs text-muted-foreground">{tr ? 'Birden fazla adres kaydedebilirsiniz (Ev, İşyeri…).' : 'Save multiple addresses (Home, Work…).'}</p>
         </div>
       </div>
 
       <div className="p-6">
-        <ShippingFields value={info} onChange={(next) => { setInfo(next); setErrors({}) }} errors={errors} lang={lang} />
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 font-sans text-xs font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {tr ? 'Bilgileri kaydet' : 'Save details'}
-          </button>
-          {saved ? (
-            <span className="inline-flex items-center gap-1.5 font-sans text-sm text-primary">
-              <Check className="size-4" aria-hidden="true" />
-              {tr ? 'Kaydedildi' : 'Saved'}
-            </span>
-          ) : null}
-        </div>
+        {addresses.length === 0 ? (
+          <p className="mb-4 font-sans text-sm text-muted-foreground">{tr ? 'Henüz kayıtlı adresiniz yok. Sipariş verebilmek için en az bir adres ekleyin.' : 'No saved addresses yet. Add at least one to place orders.'}</p>
+        ) : (
+          <ul className="mb-4 flex flex-col gap-2">
+            {addresses.map((addr) => (
+              <li key={addr.id} className="flex items-start gap-2.5 rounded-md border border-border bg-background/50 p-3">
+                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="font-sans text-sm font-medium text-card-foreground">{addr.label || (tr ? 'Adres' : 'Address')}</p>
+                  <p className="truncate font-sans text-xs text-muted-foreground">{addr.fullName} · {addr.city}{addr.district ? ` / ${addr.district}` : ''}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Link
+          href="/adreslerim"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-5 py-3 font-sans text-xs font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          {addresses.length === 0 ? (tr ? 'Adres ekle' : 'Add address') : (tr ? 'Adreslerimi yönet' : 'Manage addresses')}
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   )
