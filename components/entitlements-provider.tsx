@@ -80,9 +80,16 @@ export function EntitlementsProvider({ children }: { children: React.ReactNode }
       const membershipType = membershipRow
         ? String(membershipRow.type ?? (platin ? 'platin' : premium ? 'premium' : '')) || null
         : activeGrant ? String(activeGrant.tier ?? '') || null : null
+      // A grant with no expiry is an intentional lifetime gift, so map it to a
+      // far-future sentinel that the UI reads as "lifetime". A missing
+      // user_membership expiry stays null (unknown → "active"), never lifetime,
+      // so subscriptions and ad-unlocks can't masquerade as lifetime.
+      const LIFETIME_SENTINEL = 32503680000000 // 3000-01-01
       const membershipExpiresAt = membershipRow
         ? parseExpiry(membershipRow.expires_at)
-        : activeGrant ? parseExpiry(activeGrant.expires_at) : null
+        : activeGrant
+          ? (activeGrant.expires_at ? parseExpiry(activeGrant.expires_at) : LIFETIME_SENTINEL)
+          : null
 
       // user_ottoman_unlocks holds per-article original-text unlocks synced from
       // the mobile app: expires_at is epoch-ms (Long.MAX_VALUE = lifetime purchase,

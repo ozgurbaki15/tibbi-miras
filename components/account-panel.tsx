@@ -41,7 +41,7 @@ export function AccountPanel() {
   const tier = platin ? 'PLATİN' : premium ? 'PREMİUM' : (tr ? 'ÜYE' : 'MEMBER')
   const TierIcon = platin ? ShieldCheck : premium ? Crown : UserRound
   const isMember = premium || platin
-  const isLifetime = isMember && (membershipExpiresAt == null || membershipExpiresAt > LIFETIME_THRESHOLD)
+  const isLifetime = isMember && membershipExpiresAt != null && membershipExpiresAt > LIFETIME_THRESHOLD
   const expiryDate = formatDate(membershipExpiresAt, lang)
   const daysLeft = membershipExpiresAt != null && !isLifetime ? Math.max(0, Math.ceil((membershipExpiresAt - Date.now()) / 86400000)) : null
   const registered = formatDate(user.created_at, lang)
