@@ -1,14 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { BookOpen, Crown, FolderTree, Heart, Search, Settings } from 'lucide-react'
+import { BookOpen, Crown, FolderTree, Heart, Search, Settings, ShoppingBag } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 
 export function ArchiveNavigation() {
   const { lang } = useLanguage()
   const labels = lang === 'tr'
-    ? { home: 'Anasayfa', categories: 'Kategoriler', search: 'Arama', favorites: 'Favoriler', memberships: 'Üyelikler', settings: 'Ayarlar' }
-    : { home: 'Home', categories: 'Categories', search: 'Search', favorites: 'Favorites', memberships: 'Memberships', settings: 'Settings' }
+    ? { home: 'Anasayfa', categories: 'Kategoriler', search: 'Arama', favorites: 'Favoriler', memberships: 'Üyelikler', store: 'Mağaza', settings: 'Ayarlar' }
+    : { home: 'Home', categories: 'Categories', search: 'Search', favorites: 'Favorites', memberships: 'Memberships', store: 'Store', settings: 'Settings' }
 
   const items = [
     { href: '/', label: labels.home, icon: BookOpen },
@@ -16,6 +16,7 @@ export function ArchiveNavigation() {
     { href: '/search', label: labels.search, icon: Search },
     { href: '/favorites', label: labels.favorites, icon: Heart },
     { href: '/uyelikler', label: labels.memberships, icon: Crown },
+    { href: '/magaza', label: labels.store, icon: ShoppingBag },
     { href: '/settings', label: labels.settings, icon: Settings },
   ]
 
