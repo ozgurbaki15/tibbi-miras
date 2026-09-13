@@ -50,7 +50,7 @@ export default function FavoritesPage() {
     setLoading(true)
     ;(async () => {
       const { data: favRows } = await supabase
-        .from('favorites')
+        .from('user_favorites')
         .select('article_id')
         .eq('user_id', user.id)
       const ids = (favRows ?? []).map((row) => row.article_id)

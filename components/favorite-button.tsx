@@ -26,7 +26,7 @@ export function FavoriteButton({
       return
     }
     supabase
-      .from('favorites')
+      .from('user_favorites')
       .select('article_id')
       .eq('user_id', user.id)
       .eq('article_id', articleId)
@@ -44,9 +44,9 @@ export function FavoriteButton({
     setBusy(true)
     const next = !saved
     if (saved) {
-      await supabase.from('favorites').delete().eq('user_id', user.id).eq('article_id', articleId)
+      await supabase.from('user_favorites').delete().eq('user_id', user.id).eq('article_id', articleId)
     } else {
-      await supabase.from('favorites').insert({ user_id: user.id, article_id: articleId })
+      await supabase.from('user_favorites').upsert({ user_id: user.id, article_id: articleId })
     }
     setSaved(next)
     setBusy(false)
