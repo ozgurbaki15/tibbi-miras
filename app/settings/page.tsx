@@ -6,6 +6,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { SiteFooter } from '@/components/site-footer'
 import { AccountPanel } from '@/components/account-panel'
 import { ProfileSettings } from '@/components/profile-settings'
+import { MembershipCodeRedeemer } from '@/components/membership-code-redeemer'
 import { useLanguage } from '@/components/language-provider'
 
 export default function SettingsPage() {
@@ -20,6 +21,7 @@ export default function SettingsPage() {
         <h1 className="mb-10 font-serif text-5xl text-foreground">{tr ? 'Ayarlar' : 'Settings'}</h1>
         <div className="space-y-5">
           <ProfileSettings />
+          <MembershipCodeRedeemer />
           <AccountPanel />
           <section className="flex items-center justify-between rounded-md border border-border bg-card p-6">
             <div>
