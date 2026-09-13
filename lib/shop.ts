@@ -7,6 +7,7 @@ export type ShopCategory = {
   id: string
   name: string
   nameEn: string
+  parentId: string | null
   sortOrder: number
 }
 
@@ -30,6 +31,7 @@ type CategoryRow = {
   id: string
   name: string | null
   name_en: string | null
+  parent_id: string | null
   sort_order: number | null
 }
 
@@ -52,6 +54,7 @@ export function mapCategory(row: CategoryRow): ShopCategory {
     id: row.id,
     name: row.name ?? '',
     nameEn: row.name_en ?? '',
+    parentId: row.parent_id ?? null,
     sortOrder: row.sort_order ?? 0,
   }
 }
