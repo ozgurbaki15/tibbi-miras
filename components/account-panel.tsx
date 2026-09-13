@@ -6,6 +6,7 @@ import { useAuth } from '@/components/auth-provider'
 import { useEntitlements } from '@/components/entitlements-provider'
 import { useLanguage } from '@/components/language-provider'
 import { MembershipPlans } from '@/components/membership-plans'
+import { AccountShipping } from '@/components/account-shipping'
 
 function formatDate(value: number | string | null | undefined, lang: 'tr' | 'en') {
   if (value == null) return null
@@ -46,6 +47,7 @@ export function AccountPanel() {
   const isPlatinLifetime = platin && isLifetime
 
   return (
+    <div className="flex flex-col gap-8">
     <section className="overflow-hidden rounded-md border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-6">
         <div className="flex items-center gap-3">
@@ -98,5 +100,8 @@ export function AccountPanel() {
         </div>
       ) : null}
     </section>
+
+    <AccountShipping />
+    </div>
   )
 }
