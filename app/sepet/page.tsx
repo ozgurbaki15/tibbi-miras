@@ -12,6 +12,7 @@ import { shopPriceLabel } from '@/lib/shop'
 import { useProducts } from '@/components/products-provider'
 import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
 import { createShopOrder } from '@/app/actions/orders'
+import { supabase } from '@/lib/supabase/client'
 
 const VAT_RATE = 0.2
 const SHIPPING_FEE_KURUS = 25000 // 250 TL
@@ -26,6 +27,9 @@ export default function SepetPage() {
   const [addresses, setAddresses] = useState<ShippingAddress[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [addressError, setAddressError] = useState(false)
+  const [promoCode, setPromoCode] = useState('')
+  const [promoMessage, setPromoMessage] = useState('')
+  const [discountKurus, setDiscountKurus] = useState(0)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,7 +43,24 @@ export default function SepetPage() {
   const selectedAddress = addresses.find((a) => a.id === selectedId) ?? null
 
   const shippingFeeKurus = subtotalKurus >= FREE_SHIPPING_THRESHOLD_KURUS ? 0 : SHIPPING_FEE_KURUS
-  const grandTotalKurus = subtotalKurus + shippingFeeKurus
+  const discountedSubtotalKurus = Math.max(0, subtotalKurus - discountKurus)
+  const grandTotalKurus = discountedSubtotalKurus + shippingFeeKurus
+
+  const applyPromo = async () => {
+    const normalized = promoCode.trim().toUpperCase()
+    if (!normalized) return
+    const { data, error } = await supabase.from('tma_promo_codes').select('kind, value, active, starts_at, ends_at').eq('code', normalized).eq('active', true).maybeSingle()
+    const now = Date.now()
+    const valid = !error && data && (!data.starts_at || new Date(data.starts_at).getTime() <= now) && (!data.ends_at || new Date(data.ends_at).getTime() >= now)
+    if (!valid) {
+      setDiscountKurus(0)
+      setPromoMessage(tr ? 'İndirim kodu geçersiz veya süresi dolmuş.' : 'This promo code is invalid or expired.')
+      return
+    }
+    const discount = data.kind === 'percent' ? Math.min(subtotalKurus, Math.floor(subtotalKurus * Math.min(100, data.value) / 100)) : Math.min(subtotalKurus, data.value * 100)
+    setDiscountKurus(discount)
+    setPromoMessage(tr ? 'İndirim kodu uygulandı.' : 'Promo code applied.')
+  }
 
   // Product prices are VAT-inclusive; break the product subtotal down for display.
   const netKurus = Math.round(subtotalKurus / (1 + VAT_RATE))
@@ -59,7 +80,7 @@ export default function SepetPage() {
       return
     }
     if (selectedAddress) setSelectedAddressId(selectedAddress.id)
-    const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress)
+    const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress, promoCode)
     if (!result.ok) {
       window.alert(tr ? 'Sipariş oluşturulamadı. Lütfen sepetinizi ve adresinizi kontrol edin.' : 'The order could not be created. Please check your cart and address.')
       return
@@ -236,6 +257,7 @@ export default function SepetPage() {
                   <dt>{t.vat}</dt>
                   <dd>{shopPriceLabel(vatKurus, lang)}</dd>
                 </div>
+                {discountKurus > 0 ? <div className="flex items-center justify-between text-primary"><dt>{tr ? 'İndirim' : 'Discount'}</dt><dd>-{shopPriceLabel(discountKurus, lang)}</dd></div> : null}
                 <div className="flex items-center justify-between text-muted-foreground">
                   <dt>{t.shipping}</dt>
                   <dd>{shippingFeeKurus === 0 ? t.shippingFree : shopPriceLabel(shippingFeeKurus, lang)}</dd>
@@ -245,6 +267,11 @@ export default function SepetPage() {
                   <dd>{shopPriceLabel(grandTotalKurus, lang)}</dd>
                 </div>
               </dl>
+              <div className="mt-6 border-t border-border pt-5">
+                <label htmlFor="promo-code" className="font-sans text-xs uppercase tracking-wider text-muted-foreground">{tr ? 'İndirim kodu' : 'Promo code'}</label>
+                <div className="mt-2 flex gap-2"><input id="promo-code" value={promoCode} onChange={(event) => setPromoCode(event.target.value)} className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 font-sans text-sm uppercase outline-none focus:border-primary" placeholder={tr ? 'KODUNUZ' : 'YOUR CODE'} /><button type="button" onClick={() => void applyPromo()} className="rounded-md border border-primary px-3 py-2 font-sans text-xs text-primary">{tr ? 'Uygula' : 'Apply'}</button></div>
+                {promoMessage ? <p className="mt-2 font-sans text-xs text-muted-foreground">{promoMessage}</p> : null}
+              </div>
               <button type="button" onClick={handlePay} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 font-sans text-sm font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90">
                 {t.pay}
               </button>

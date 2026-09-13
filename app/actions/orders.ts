@@ -8,7 +8,7 @@ const FREE_SHIPPING_THRESHOLD_KURUS = 300000
 type CartLine = { id: string; quantity: number }
 type ShippingAddress = { fullName: string; phone: string; address: string; city: string; district: string; postalCode: string; tcNo?: string }
 
-export async function createShopOrder(lines: CartLine[], address: ShippingAddress) {
+export async function createShopOrder(lines: CartLine[], address: ShippingAddress, promoCode = '') {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false as const, error: 'auth_required' }
@@ -27,10 +27,19 @@ export async function createShopOrder(lines: CartLine[], address: ShippingAddres
   if (validated.some((line) => !line)) return { ok: false as const, error: 'stock_limit' }
   const items = validated as { product_id: string; product_name: string; unit_price_kurus: number; quantity: number }[]
   const subtotal = items.reduce((sum, item) => sum + item.unit_price_kurus * item.quantity, 0)
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD_KURUS ? 0 : SHIPPING_FEE_KURUS
+  let discount = 0
+  if (promoCode.trim()) {
+    const { data: promo } = await supabase.from('tma_promo_codes').select('kind, value, active, starts_at, ends_at, max_uses, used_count').eq('code', promoCode.trim().toUpperCase()).eq('active', true).maybeSingle()
+    const now = Date.now()
+    if (promo && (!promo.starts_at || new Date(promo.starts_at).getTime() <= now) && (!promo.ends_at || new Date(promo.ends_at).getTime() >= now) && (promo.max_uses === null || promo.used_count < promo.max_uses)) {
+      discount = promo.kind === 'percent' ? Math.min(subtotal, Math.floor(subtotal * Math.min(100, Number(promo.value)) / 100)) : Math.min(subtotal, Number(promo.value) * 100)
+    }
+  }
+  const discountedSubtotal = Math.max(0, subtotal - discount)
+  const shipping = discountedSubtotal >= FREE_SHIPPING_THRESHOLD_KURUS ? 0 : SHIPPING_FEE_KURUS
   const { data: numberData, error: numberError } = await supabase.rpc('tma_next_order_number')
   if (numberError || !numberData) return { ok: false as const, error: 'order_number_failed' }
-  const { data: order, error: orderError } = await supabase.from('tma_orders').insert({ order_number: String(numberData), user_id: user.id, subtotal_kurus: subtotal, shipping_kurus: shipping, total_kurus: subtotal + shipping, phone_snapshot: address.phone, address_snapshot: address, current_phone: address.phone, current_address: address }).select('id, order_number').single()
+  const { data: order, error: orderError } = await supabase.from('tma_orders').insert({ order_number: String(numberData), user_id: user.id, subtotal_kurus: discountedSubtotal, shipping_kurus: shipping, total_kurus: discountedSubtotal + shipping, phone_snapshot: address.phone, address_snapshot: address, current_phone: address.phone, current_address: address }).select('id, order_number').single()
   if (orderError || !order) return { ok: false as const, error: 'order_create_failed' }
   const { error: itemsError } = await supabase.from('tma_order_items').insert(items.map((item) => ({ ...item, order_id: order.id })))
   if (itemsError) return { ok: false as const, error: 'order_items_failed' }
