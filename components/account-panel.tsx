@@ -96,7 +96,7 @@ export function AccountPanel() {
         <div className="border-t border-border p-6">
           <h3 className="font-serif text-xl text-card-foreground">{isMember ? (tr ? 'Üyeliğini yükselt' : 'Upgrade your membership') : (tr ? 'Üyelik planları' : 'Membership plans')}</h3>
           <p className="mb-5 mt-2 font-sans text-sm leading-relaxed text-muted-foreground">{tr ? 'Tarihî arşivin genişletilmiş metinlerine ve özel eserlere erişin. Uygulamada satın aldığınız üyelik burada da geçerlidir.' : 'Unlock extended texts and exclusive works. Memberships purchased in the app also work here.'}</p>
-          <MembershipPlans premium={premium} platin={platin} isPremiumLifetime={premium && isLifetime} isPlatinLifetime={platin && isLifetime} />
+          <MembershipPlans premium={premium} platin={platin} isPremiumLifetime={premium && isLifetime} isPlatinLifetime={platin && isLifetime} expiresAt={isLifetime ? null : membershipExpiresAt} />
         </div>
       ) : null}
     </section>

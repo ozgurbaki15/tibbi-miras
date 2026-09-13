@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Minus, Plus, ShoppingCart, Trash2, Truck, PackageCheck, X } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, Truck, PackageCheck, X, MapPin } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
 import { getShopProduct, shopPriceLabel } from '@/lib/shop'
-import { ShippingFields } from '@/components/shipping-fields'
-import { EMPTY_SHIPPING, loadShipping, saveShipping, shippingErrors, type ShippingInfo } from '@/lib/shipping'
+import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
 
 const VAT_RATE = 0.2
 const SHIPPING_FEE_KURUS = 25000 // 250 TL
@@ -23,16 +22,23 @@ export default function SepetPage() {
   const { items, count, subtotalKurus, setQuantity, remove } = useCart()
   const tr = lang === 'tr'
 
-  const [shipping, setShipping] = useState<ShippingInfo>(EMPTY_SHIPPING)
-  const [shippingErrs, setShippingErrs] = useState<Partial<Record<keyof ShippingInfo, boolean>>>({})
+  const [addresses, setAddresses] = useState<ShippingAddress[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [addressError, setAddressError] = useState(false)
   const [cargoOption, setCargoOption] = useState<CargoOption | null>(null)
   const [cargoError, setCargoError] = useState(false)
   const [codNoticeOpen, setCodNoticeOpen] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setShipping(loadShipping())
+    const list = loadAddresses()
+    setAddresses(list)
+    const preferred = getSelectedAddressId()
+    const initial = list.find((a) => a.id === preferred) ?? list[0]
+    if (initial) setSelectedId(initial.id)
   }, [])
+
+  const selectedAddress = addresses.find((a) => a.id === selectedId) ?? null
 
   const shippingFeeKurus = cargoOption === 'prepaid' ? SHIPPING_FEE_KURUS : 0
   const grandTotalKurus = subtotalKurus + shippingFeeKurus
@@ -57,17 +63,23 @@ export default function SepetPage() {
     setCodNoticeOpen(false)
   }
 
+  const selectAddress = (id: string) => {
+    setSelectedId(id)
+    setSelectedAddressId(id)
+    setAddressError(false)
+  }
+
   const handlePay = () => {
-    const errs = shippingErrors(shipping)
-    setShippingErrs(errs)
+    const noAddress = !selectedAddress || !isShippingComplete(selectedAddress)
+    setAddressError(noAddress)
     const noCargo = cargoOption === null
     setCargoError(noCargo)
-    if (Object.keys(errs).length > 0 || noCargo) {
+    if (noAddress || noCargo) {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
-    saveShipping(shipping)
-    // Payment infrastructure is wired separately; persist details and proceed.
+    if (selectedAddress) setSelectedAddressId(selectedAddress.id)
+    // Payment infrastructure is wired separately; persist selection and proceed.
     window.location.href = '/odeme'
   }
 
@@ -86,6 +98,11 @@ export default function SepetPage() {
         note: 'Ürün fiyatlarına KDV dahildir. Ürün ücreti internet üzerinden güvenli altyapı ile alınır.',
         remove: 'Kaldır',
         deliveryTitle: 'Teslimat Bilgileri',
+        chooseAddress: 'Kayıtlı adreslerinizden birini seçin:',
+        noAddress: 'Kayıtlı adresiniz yok. Sipariş verebilmek için önce bir adres ekleyin.',
+        addAddress: 'Adres ekle',
+        manageAddresses: 'Adreslerimi yönet',
+        addressRequired: 'Lütfen bir teslimat adresi seçin.',
         cargoTitle: 'Kargo Ücreti',
         cargoHint: 'Kargo ücretini nasıl ödemek istersiniz?',
         codLabel: 'Kapıda ödeme',
@@ -113,6 +130,11 @@ export default function SepetPage() {
         note: 'Product prices include VAT. The product fee is collected online via secure infrastructure.',
         remove: 'Remove',
         deliveryTitle: 'Delivery Details',
+        chooseAddress: 'Choose one of your saved addresses:',
+        noAddress: 'You have no saved address. Add one before placing an order.',
+        addAddress: 'Add address',
+        manageAddresses: 'Manage addresses',
+        addressRequired: 'Please select a delivery address.',
         cargoTitle: 'Shipping Fee',
         cargoHint: 'How would you like to pay the shipping fee?',
         codLabel: 'Cash on delivery',
@@ -186,7 +208,45 @@ export default function SepetPage() {
                   <Truck className="size-5 text-primary" aria-hidden="true" />
                   <h2 className="font-serif text-xl text-card-foreground">{t.deliveryTitle}</h2>
                 </div>
-                <ShippingFields value={shipping} onChange={(next) => { setShipping(next); setShippingErrs({}) }} errors={shippingErrs} lang={lang} />
+
+                {addresses.length === 0 ? (
+                  <div className="rounded-md border border-dashed border-border p-6 text-center">
+                    <p className="mb-4 font-sans text-sm text-muted-foreground">{t.noAddress}</p>
+                    <Link href="/adreslerim" className="inline-flex items-center gap-1.5 rounded-md bg-primary px-5 py-3 font-sans text-xs font-medium uppercase tracking-wider text-primary-foreground transition-colors hover:bg-primary/90">
+                      <MapPin className="size-4" /> {t.addAddress}
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    <p className="mb-3 font-sans text-sm text-muted-foreground">{t.chooseAddress}</p>
+                    <div className="flex flex-col gap-3">
+                      {addresses.map((addr) => {
+                        const active = selectedId === addr.id
+                        return (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            onClick={() => selectAddress(addr.id)}
+                            className={`flex items-start gap-3 rounded-md border p-4 text-left transition-colors ${active ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
+                          >
+                            <span className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border ${active ? 'border-primary' : 'border-muted-foreground'}`}>
+                              {active ? <span className="size-2.5 rounded-full bg-primary" /> : null}
+                            </span>
+                            <span className="flex min-w-0 flex-col gap-0.5">
+                              <span className="font-sans text-sm font-medium text-card-foreground">{addr.label || (tr ? 'Adres' : 'Address')}</span>
+                              <span className="font-sans text-xs text-muted-foreground">{addr.fullName} · {addr.phone}</span>
+                              <span className="font-sans text-xs text-muted-foreground">{addr.address}, {addr.district} / {addr.city} {addr.postalCode}</span>
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {addressError ? <p className="mt-3 font-sans text-xs text-destructive">{t.addressRequired}</p> : null}
+                    <Link href="/adreslerim" className="mt-4 inline-flex items-center gap-1.5 font-sans text-xs uppercase tracking-wider text-primary hover:underline">
+                      <MapPin className="size-3.5" /> {t.manageAddresses}
+                    </Link>
+                  </>
+                )}
               </div>
 
               <div className="rounded-md border border-border bg-card p-6">
