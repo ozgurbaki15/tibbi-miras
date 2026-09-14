@@ -89,7 +89,7 @@
 
 html[data-theme='parchment'] {
   color-scheme: light;
-  --background: oklch(0.965 0.018 88);
+  --background: oklch(0.93 0.035 84);
   --foreground: oklch(0.24 0.035 62);
   --card: oklch(0.985 0.012 88);
   --card-foreground: oklch(0.24 0.035 62);
@@ -211,5 +211,14 @@ html[data-theme='obsidian'] {
   }
   body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(to bottom, color-mix(in oklch, var(--background) 88%, transparent), color-mix(in oklch, var(--background) 94%, transparent)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+    background-attachment: fixed;
+    background-position: center top;
+    background-size: cover;
+  }
+
+  html[data-theme='parchment'] body,
+  html[data-theme='manuscript'] body {
+    background-blend-mode: multiply;
   }
 }
