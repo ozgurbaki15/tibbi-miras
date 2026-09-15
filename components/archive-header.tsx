@@ -18,7 +18,16 @@ export function ArchiveHeader() {
 
   return (
     <header className="border-b border-border">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 pt-6">
+      <Link
+        href="/uyelikler"
+        className="fixed left-4 top-4 z-50 inline-flex items-center gap-2 rounded-full border-2 border-primary bg-primary px-4 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        aria-label={lang === 'tr' ? 'Abonelikler sayfasına git' : 'Go to subscriptions'}
+      >
+        <span aria-hidden="true">★</span>
+        {lang === 'tr' ? 'Abonelikler' : 'Subscriptions'}
+      </Link>
+
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-end gap-3 px-6 pt-20 sm:justify-between sm:pt-6">
         <AccountMenu />
         <div className="flex items-center gap-3">
           <a
