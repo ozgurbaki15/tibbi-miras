@@ -27,7 +27,7 @@ export function ArchiveHeader() {
         {lang === 'tr' ? 'Abonelikler' : 'Subscriptions'}
       </Link>
 
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 pt-6">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-end gap-3 px-6 pt-20 sm:justify-between sm:pt-6">
         <AccountMenu />
         <div className="flex items-center gap-3">
           <a
