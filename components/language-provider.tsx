@@ -61,8 +61,8 @@ export const UI = {
     eyebrow: 'Freed Science',
     intro:
       'Tıp tarihinin nadide el yazmaları ve basılı eserleri. Şifanın binlerce yıllık hafızasını tek bir çatı altında derliyoruz.',
-    collection: 'Koleksiyon',
-    countSuffix: 'eser · sürekli genişleyen dijital derlem',
+    collection: 'İlm-i Tıbb Ansiklopedisi',
+    countSuffix: 'eser · sürekli genişleyen dijital arşiv',
     selection: 'Görsel arşivden seçkiler',
     searchPlaceholder: 'Eser başlığına göre ara…',
     searchLabel: 'Eserleri başlığa göre ara',

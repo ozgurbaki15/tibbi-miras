@@ -20,7 +20,7 @@ export function ArchiveHeader() {
     <header className="border-b border-border">
       <Link
         href="/uyelikler"
-        className="fixed left-4 top-4 z-50 inline-flex items-center gap-2 rounded-full border-2 border-primary bg-primary px-4 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="fixed left-4 top-7 z-50 inline-flex items-center gap-2 rounded-full border-2 border-primary bg-primary px-4 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         aria-label={lang === 'tr' ? 'Abonelikler sayfasına git' : 'Go to subscriptions'}
       >
         <span aria-hidden="true">★</span>

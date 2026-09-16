@@ -58,7 +58,7 @@ export function CategorySection({ categories }: { categories: Category[] }) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-8" aria-labelledby="categories-heading">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <div><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'Koleksiyonlar' : 'Collections'}</h2></div>
+        <div><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'İlm-i Tıbb Ansiklopedisi' : 'Collections'}</h2></div>
         <Link href="/categories" className="font-sans text-xs uppercase tracking-wider text-primary hover:text-accent">{lang === 'tr' ? 'Tümünü gör' : 'View all'}</Link>
       </div>
       <div className="flex flex-col gap-1">{tree.map((node) => <CategoryBranch key={node.id} node={node} />)}</div>
