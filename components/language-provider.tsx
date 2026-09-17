@@ -79,8 +79,8 @@ export const UI = {
     eyebrow: 'Freed Science',
     intro:
       'Rare manuscripts and printed works spanning the history of medicine. We gather the millennia-old memory of healing under a single roof.',
-    collection: 'Collection',
-    countSuffix: 'works · a continually growing digital corpus',
+    collection: 'Medical Heritage Encyclopedia',
+    countSuffix: 'works · a continually growing digital archive',
     selection: 'Selections from the visual archive',
     searchPlaceholder: 'Search by title…',
     searchLabel: 'Search works by title',
