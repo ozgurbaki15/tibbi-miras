@@ -38,7 +38,7 @@ export function AccountPanel() {
     )
   }
 
-  const tier = platin ? 'PLATİN' : premium ? 'PREMİUM' : (tr ? 'ÜYE' : 'MEMBER')
+  const tier = platin ? (tr ? 'PLATİN' : 'PLATINUM') : premium ? 'PREMIUM' : (tr ? 'ÜYE' : 'MEMBER')
   const TierIcon = platin ? ShieldCheck : premium ? Crown : UserRound
   const isMember = premium || platin
   const isLifetime = isMember && membershipExpiresAt != null && membershipExpiresAt > LIFETIME_THRESHOLD
