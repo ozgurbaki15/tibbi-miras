@@ -11,7 +11,7 @@ import { CheckoutButton } from '@/components/checkout-button'
 import { getProduct, priceLabel } from '@/lib/products'
 import { originalTextPreview, type Article, type ArticleTerm } from '@/lib/types'
 
-export function OriginalTextSection({ article, terms = [] }: { article: Article; terms?: ArticleTerm[] }) {
+export function OriginalTextSection({ article, terms = [], linksEnabled = true }: { article: Article; terms?: ArticleTerm[]; linksEnabled?: boolean }) {
   const { lang } = useLanguage()
   const t = UI[lang]
   const { user } = useAuth()
@@ -35,10 +35,10 @@ export function OriginalTextSection({ article, terms = [] }: { article: Article;
       </div>
 
       {unlocked || !hasLockedPart ? (
-        <LinkedArticleText text={article.original_text} terms={terms} activeArticleId={article.id} className="max-w-none text-pretty font-serif text-lg italic leading-loose text-foreground/85" />
+        <LinkedArticleText text={article.original_text} terms={terms} activeArticleId={article.id} linksEnabled={linksEnabled} className="max-w-none text-pretty font-serif text-lg italic leading-loose text-foreground/85" />
       ) : (
         <div>
-          <LinkedArticleText text={preview} terms={terms} activeArticleId={article.id} className="max-w-none text-pretty font-serif text-lg italic leading-loose text-foreground/85" />
+          <LinkedArticleText text={preview} terms={terms} activeArticleId={article.id} linksEnabled={linksEnabled} className="max-w-none text-pretty font-serif text-lg italic leading-loose text-foreground/85" />
 
           <div className="relative mt-4 overflow-hidden rounded-md border border-primary/30">
             <div className="pointer-events-none select-none px-1 py-3 blur-sm" aria-hidden="true">
