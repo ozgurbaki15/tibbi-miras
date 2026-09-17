@@ -6,6 +6,7 @@ import { Search } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
+import { useLanguage } from '@/components/language-provider'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
 import { ARTICLE_COLUMNS, articleTitle, type Article } from '@/lib/types'
 
@@ -14,6 +15,7 @@ export default function SearchPage() {
   const [includeContent, setIncludeContent] = useState(false)
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
+  const { lang } = useLanguage()
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -60,16 +62,16 @@ export default function SearchPage() {
       <ArchiveHeader />
       <ArchiveNavigation />
       <section className="mx-auto max-w-6xl px-6 py-14">
-        <p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">Encyclopedia search</p>
-        <h1 className="mb-8 font-serif text-5xl text-foreground">Arşivde ara</h1>
+        <p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Ansiklopedi araması' : 'Encyclopedia search'}</p>
+        <h1 className="mb-8 font-serif text-5xl text-foreground">{lang === 'tr' ? 'Arşivde ara' : 'Search the archive'}</h1>
         <div className="relative mb-4 max-w-2xl">
           <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Makale başlığı ara…"
-            aria-label="Makale ara"
+            placeholder={lang === 'tr' ? 'Makale başlığı ara…' : 'Search article titles…'}
+            aria-label={lang === 'tr' ? 'Makale ara' : 'Search articles'}
             className="w-full rounded-md border border-border bg-card py-4 pl-12 pr-4 font-sans text-sm text-foreground outline-none focus:border-primary"
           />
         </div>
@@ -81,7 +83,7 @@ export default function SearchPage() {
               onChange={() => setIncludeContent(false)}
               className="size-4 accent-primary"
             />
-            Sadece başlıklarda ara
+            {lang === 'tr' ? 'Sadece başlıklarda ara' : 'Search titles only'}
           </label>
           <label className="inline-flex items-center gap-2">
             <input
@@ -90,11 +92,11 @@ export default function SearchPage() {
               onChange={(event) => setIncludeContent(event.target.checked)}
               className="size-4 accent-primary"
             />
-            Gönderileri de dahil et
+            {lang === 'tr' ? 'Gönderileri de dahil et' : 'Include article content'}
           </label>
         </div>
         {loading ? (
-          <p className="font-serif text-xl text-muted-foreground">Arşiv yükleniyor…</p>
+          <p className="font-serif text-xl text-muted-foreground">{lang === 'tr' ? 'Arşiv yükleniyor…' : 'Loading archive…'}</p>
         ) : (
           <>
             <p className="mb-5 font-sans text-xs uppercase tracking-wider text-muted-foreground">{results.length} sonuç</p>
