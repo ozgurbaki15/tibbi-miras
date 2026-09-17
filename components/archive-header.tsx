@@ -54,7 +54,7 @@ export function ArchiveHeader() {
             {t.eyebrow}
           </Link>
           <h1 className="mb-6 text-balance font-serif text-3xl font-semibold leading-tight text-foreground md:text-5xl">
-            Kadim Tıbbın İhyası
+            {lang === 'tr' ? 'Kadim Tıbbın İhyası' : 'Reviving Ancient Medicine'}
           </h1>
 
           <div

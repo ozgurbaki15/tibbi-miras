@@ -62,7 +62,7 @@ export function ArticleGrid({ articles }: { articles: Article[] }) {
           />
           <label className="mt-3 flex items-center gap-2 font-sans text-xs text-muted-foreground">
             <input type="checkbox" checked={includeContent} onChange={(event) => setIncludeContent(event.target.checked)} className="size-4 accent-primary" />
-            Gönderi içeriklerini de dahil et
+            {lang === 'tr' ? 'Gönderi içeriklerini de dahil et' : 'Include article content'}
           </label>
         </div>
       </div>
