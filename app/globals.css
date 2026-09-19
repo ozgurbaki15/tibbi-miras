@@ -139,8 +139,8 @@ html[data-theme='image-focus'] {
 }
 
 html[data-theme='menu-default'] {
-  color-scheme: light;
-  background-color: #d8c7a5;
+  color-scheme: dark;
+  background-color: #171a1d;
   background-image: linear-gradient(rgba(246, 239, 220, 0.18), rgba(246, 239, 220, 0.18)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
   background-attachment: fixed;
   background-position: center top;
@@ -166,7 +166,7 @@ html[data-theme='celestial'] .bg-background {
 }
 
 html[data-theme='menu-default'] .bg-background {
-  background-color: color-mix(in srgb, var(--background) 24%, transparent);
+  background-color: color-mix(in srgb, #171a1d 34%, transparent) !important;
 }
 
 html[data-theme='image-focus'] .bg-background,
@@ -176,8 +176,33 @@ html[data-theme='menu-default'] .bg-background {
 
 html[data-theme='menu-default'] main,
 html[data-theme='menu-default'] article,
-html[data-theme='menu-default'] section {
+html[data-theme='menu-default'] section,
+html[data-theme='menu-default'] header,
+html[data-theme='menu-default'] footer {
   isolation: isolate;
+}
+
+html[data-theme='menu-default'] .archive-emblem {
+  max-height: min(48vw, 34rem);
+  object-fit: contain;
+  mix-blend-mode: screen;
+  opacity: 0.84;
+  filter: contrast(1.04) brightness(0.88) saturate(0.9);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 13%, black 87%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 13%, black 87%, transparent 100%);
+  -webkit-mask-composite: intersect;
+  mask-composite: intersect;
+}
+
+html[data-theme='menu-default'] header,
+html[data-theme='menu-default'] nav,
+html[data-theme='menu-default'] footer {
+  background-color: color-mix(in srgb, #171a1d 58%, transparent) !important;
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme='menu-default'] .archive-emblem + p {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
 }
 
 html[data-theme='menu-default'] .bg-card,
