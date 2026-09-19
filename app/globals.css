@@ -89,6 +89,42 @@
 
 html[data-theme='parchment'] {
   color-scheme: light;
+  background-color: #e9ddc2;
+  background-image: linear-gradient(rgba(245, 237, 218, 0.72), rgba(245, 237, 218, 0.72)), url('/images/manuscript-plate.png');
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+html[data-theme='obsidian'] {
+  color-scheme: dark;
+  background-color: #10151a;
+  background-image: linear-gradient(rgba(9, 14, 20, 0.72), rgba(9, 14, 20, 0.72)), url('/images/apothecary-plate.png');
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+html[data-theme='manuscript'] {
+  color-scheme: light;
+  background-color: #d1b477;
+  background-image: linear-gradient(rgba(220, 193, 143, 0.66), rgba(220, 193, 143, 0.66)), url('/images/herbal-plate.png');
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+html[data-theme='parchment'] body,
+html[data-theme='obsidian'] body,
+html[data-theme='manuscript'] body {
+  background: transparent;
+}
+
+html[data-theme='parchment'] .bg-background,
+html[data-theme='manuscript'] .bg-background,
+html[data-theme='obsidian'] .bg-background {
+  background-color: color-mix(in srgb, var(--background) 82%, transparent);
+}
+
+html[data-theme='parchment'] {
+  color-scheme: light;
   --background: oklch(0.93 0.035 84);
   --foreground: oklch(0.24 0.035 62);
   --card: oklch(0.985 0.012 88);

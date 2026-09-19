@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, FolderTree, Minus, Plus } from 'lucide-react'
+import { ChevronDown, FolderTree, Minus, Plus, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 import type { Category } from '@/lib/types'
 
@@ -32,9 +32,9 @@ function CategoryBranch({ node, depth = 0 }: { node: CategoryNode; depth?: numbe
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center rounded-md border border-border bg-card/50 transition-colors hover:border-primary/50 hover:bg-card">
+      <div className="group flex items-center overflow-hidden rounded-xl border border-primary/35 bg-card/75 shadow-[0_8px_24px_rgba(55,35,15,0.12)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary">
         {hasChildren ? (
-          <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex min-h-14 flex-1 items-center gap-3 p-4 text-left">
+          <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex min-h-14 flex-1 items-center gap-3 px-4 py-3 text-left">
             {open ? <Minus className="size-4 shrink-0 text-primary" aria-hidden="true" /> : <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />}
             <FolderTree className="size-4 shrink-0 text-primary" aria-hidden="true" />
             <span className="font-sans text-sm font-medium text-card-foreground">{name}</span>
@@ -58,7 +58,7 @@ export function CategorySection({ categories }: { categories: Category[] }) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-8" aria-labelledby="categories-heading">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <div><p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'İlm-i Tıbb Ansiklopedisi' : 'Medical Heritage Encyclopedia'}</h2></div>
+        <div><p className="mb-2 flex items-center gap-2 font-sans text-xs uppercase tracking-[0.25em] text-primary"><Sparkles className="size-3" aria-hidden="true" />{lang === 'tr' ? 'Keşfet' : 'Explore'}</p><h2 id="categories-heading" className="font-serif text-3xl font-semibold text-foreground">{lang === 'tr' ? 'İlm-i Tıbb Ansiklopedisi' : 'Medical Heritage Encyclopedia'}</h2></div>
         <Link href="/categories" className="font-sans text-xs uppercase tracking-wider text-primary hover:text-accent">{lang === 'tr' ? 'Tümünü gör' : 'View all'}</Link>
       </div>
       <div className="flex flex-col gap-1">{tree.map((node) => <CategoryBranch key={node.id} node={node} />)}</div>
