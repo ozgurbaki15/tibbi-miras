@@ -60,7 +60,7 @@ export function ArchiveHeader() {
           <img
             src={emblemImage}
             alt={lang === 'tr' ? 'Özgür Tıp amblemi' : 'Freed Science emblem'}
-            className="mx-auto block w-full max-w-5xl rounded-[1.25rem] object-cover object-center shadow-[0_18px_50px_rgba(40,25,10,0.2)]"
+            className="mx-auto block w-full max-w-5xl object-cover object-center"
           />
 
           <p className="mt-6 font-serif text-2xl italic text-foreground md:text-3xl">
