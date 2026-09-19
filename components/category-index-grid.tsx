@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Beef, CupSoda, Eye, FlaskConical, Gem, Leaf, Lock, Pill, ScrollText, Shirt, Sparkles } from 'lucide-react'
+import { Beef, ChevronDown, CupSoda, Eye, FlaskConical, Gem, Leaf, Lock, Minus, Pill, Plus, ScrollText, Shirt, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 import type { Category } from '@/lib/types'
 
@@ -59,15 +59,24 @@ function CategoryCard({ category, child = false }: { category: Category; child?:
 
 function CategoryTree({ tree }: { tree: CategoryNode[] }) {
   const { lang } = useLanguage()
+  const [open, setOpen] = useState<Record<string, boolean>>({})
   return (
-    <div className="flex flex-col gap-10">
-      {tree.map((parent) => (
-        <section key={parent.id} aria-labelledby={`category-${parent.id}`} className="flex flex-col gap-4">
-          <h2 id={`category-${parent.id}`} className="border-b border-primary/30 pb-2 font-serif text-3xl text-foreground">{lang === 'tr' ? parent.name_tr || parent.name_en : parent.name_en || parent.name_tr}</h2>
-          <CategoryCard category={parent} />
-          {parent.children.length > 0 ? <div className="grid items-start gap-4 border-s-2 border-primary/25 ps-4 sm:grid-cols-2 lg:grid-cols-3">{parent.children.map((child) => <CategoryCard key={child.id} category={child} child />)}</div> : null}
-        </section>
-      ))}
+    <div className="flex flex-col gap-4">
+      {tree.map((parent) => {
+        const name = lang === 'tr' ? parent.name_tr || parent.name_en : parent.name_en || parent.name_tr
+        const isOpen = Boolean(open[String(parent.id)])
+        const hasChildren = parent.children.length > 0
+        return (
+          <section key={parent.id} aria-labelledby={`category-${parent.id}`} className="overflow-hidden rounded-2xl border border-primary/35 bg-card/75 shadow-[0_10px_30px_rgba(55,35,15,0.12)] backdrop-blur-sm">
+            <div className="flex items-center gap-3 border-b border-primary/20 px-5 py-4">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary"><CategoryMark name={name || ''} /></span>
+              <h2 id={`category-${parent.id}`} className="min-w-0 flex-1 font-serif text-2xl text-foreground">{name}</h2>
+              {hasChildren ? <button type="button" aria-expanded={isOpen} aria-controls={`children-${parent.id}`} onClick={() => setOpen((current) => ({ ...current, [String(parent.id)]: !isOpen }))} className="flex size-9 shrink-0 items-center justify-center rounded-full border border-primary/50 text-primary transition hover:bg-primary hover:text-primary-foreground" aria-label={isOpen ? (lang === 'tr' ? 'Alt kategorileri kapat' : 'Collapse subcategories') : (lang === 'tr' ? 'Alt kategorileri aç' : 'Expand subcategories')}>{isOpen ? <Minus className="size-4" /> : <Plus className="size-4" />}</button> : null}
+            </div>
+            {hasChildren && isOpen ? <div id={`children-${parent.id}`} className="grid items-start gap-3 border-t border-primary/15 bg-background/25 p-4 sm:grid-cols-2 lg:grid-cols-3">{parent.children.map((child) => <CategoryCard key={child.id} category={child} child />)}</div> : null}
+          </section>
+        )
+      })}
     </div>
   )
 }
