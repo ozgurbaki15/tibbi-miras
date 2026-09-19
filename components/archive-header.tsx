@@ -57,16 +57,10 @@ export function ArchiveHeader() {
             {lang === 'tr' ? 'Kadim Tıbbın İhyası' : 'Reviving Ancient Medicine'}
           </h1>
 
-          <div
-            className="mx-auto aspect-[16/7] w-full max-w-5xl rounded-[1.75rem] border border-primary/50 bg-[#171725] shadow-2xl shadow-primary/10"
-            style={{
-              backgroundImage: `linear-gradient(rgba(20, 20, 31, 0.12), rgba(20, 20, 31, 0.12)), url('${emblemImage}')`,
-              backgroundPosition: 'center',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-            }}
-            role="img"
-            aria-label={lang === 'tr' ? 'Özgür Tıp amblemi' : 'Freed Science emblem'}
+          <img
+            src={emblemImage}
+            alt={lang === 'tr' ? 'Özgür Tıp amblemi' : 'Freed Science emblem'}
+            className="mx-auto block w-full max-w-5xl rounded-[1.25rem] object-cover object-center shadow-[0_18px_50px_rgba(40,25,10,0.2)]"
           />
 
           <p className="mt-6 font-serif text-2xl italic text-foreground md:text-3xl">

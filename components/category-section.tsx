@@ -12,8 +12,9 @@ function buildTree(categories: Category[]): CategoryNode[] {
   const nodes = new Map(categories.map((category) => [String(category.id), { ...category, children: [] as CategoryNode[] }]))
   const roots: CategoryNode[] = []
   nodes.forEach((node) => {
-    if (node.parent_id == null) roots.push(node)
-    else nodes.get(String(node.parent_id))?.children.push(node)
+    const parent = node.parent_id == null ? undefined : nodes.get(String(node.parent_id))
+    if (parent) parent.children.push(node)
+    else roots.push(node)
   })
   const sortTree = (items: CategoryNode[]) => {
     items.sort((a, b) => (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER) || String(a.id).localeCompare(String(b.id)))
