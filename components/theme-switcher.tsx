@@ -1,12 +1,16 @@
 'use client'
 
-import { Moon, Palette, ScrollText, Sun } from 'lucide-react'
+import { Leaf, Moon, Palette, ScrollText, Sparkles, Sun } from 'lucide-react'
 import { useTheme, type ThemeName } from '@/components/theme-provider'
 
 const themes: { id: ThemeName; label: string; icon: typeof Sun }[] = [
-  { id: 'parchment', label: 'Parchment', icon: Sun },
-  { id: 'manuscript', label: 'Manuscript', icon: ScrollText },
-  { id: 'obsidian', label: 'Obsidian', icon: Moon },
+  { id: 'parchment', label: 'Varsayılan Parşömen', icon: Sun },
+  { id: 'manuscript', label: 'Belirgin Bitki', icon: Leaf },
+  { id: 'obsidian', label: 'Koyu Eczane', icon: Moon },
+  { id: 'herbarium', label: 'Herbaryum', icon: Leaf },
+  { id: 'celestial', label: 'Göksel Levha', icon: Sparkles },
+  { id: 'image-focus', label: 'Resim Odaklı · %75 şeffaf', icon: Palette },
+  { id: 'menu-default', label: 'Menu_default · Makale resmi', icon: ScrollText },
 ]
 
 export function ThemeSwitcher() {

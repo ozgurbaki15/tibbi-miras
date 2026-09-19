@@ -111,16 +111,79 @@ html[data-theme='manuscript'] {
   background-size: cover;
 }
 
+html[data-theme='herbarium'] {
+  color-scheme: light;
+  background-color: #b7c4a0;
+  background-image: linear-gradient(rgba(225, 235, 203, 0.34), rgba(225, 235, 203, 0.34)), url('/images/flora-plate.png');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+}
+
+html[data-theme='celestial'] {
+  color-scheme: dark;
+  background-color: #17233b;
+  background-image: linear-gradient(rgba(15, 28, 56, 0.3), rgba(15, 28, 56, 0.3)), url('/images/astronomy-plate.png');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+}
+
+html[data-theme='image-focus'] {
+  color-scheme: dark;
+  background-color: #202536;
+  background-image: linear-gradient(rgba(20, 24, 36, 0.25), rgba(20, 24, 36, 0.25)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+  background-attachment: fixed;
+  background-position: center top;
+  background-size: cover;
+}
+
+html[data-theme='menu-default'] {
+  color-scheme: light;
+  background-color: #d8c7a5;
+  background-image: linear-gradient(rgba(246, 239, 220, 0.18), rgba(246, 239, 220, 0.18)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+  background-attachment: fixed;
+  background-position: center top;
+  background-size: cover;
+}
+
 html[data-theme='parchment'] body,
 html[data-theme='obsidian'] body,
-html[data-theme='manuscript'] body {
+html[data-theme='manuscript'] body,
+html[data-theme='herbarium'] body,
+html[data-theme='celestial'] body,
+html[data-theme='image-focus'] body,
+html[data-theme='menu-default'] body {
   background: transparent;
 }
 
 html[data-theme='parchment'] .bg-background,
 html[data-theme='manuscript'] .bg-background,
-html[data-theme='obsidian'] .bg-background {
-  background-color: color-mix(in srgb, var(--background) 82%, transparent);
+html[data-theme='obsidian'] .bg-background,
+html[data-theme='herbarium'] .bg-background,
+html[data-theme='celestial'] .bg-background {
+  background-color: color-mix(in srgb, var(--background) 48%, transparent);
+}
+
+html[data-theme='menu-default'] .bg-background {
+  background-color: color-mix(in srgb, var(--background) 24%, transparent);
+}
+
+html[data-theme='image-focus'] .bg-background,
+html[data-theme='menu-default'] .bg-background {
+  background-color: color-mix(in srgb, var(--background) 25%, transparent);
+}
+
+html[data-theme='menu-default'] main,
+html[data-theme='menu-default'] article,
+html[data-theme='menu-default'] section {
+  isolation: isolate;
+}
+
+html[data-theme='menu-default'] .bg-card,
+html[data-theme='menu-default'] .bg-popover {
+  background-color: color-mix(in srgb, var(--card) 62%, transparent);
+  backdrop-filter: blur(3px);
 }
 
 html[data-theme='parchment'] {

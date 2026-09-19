@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-export type ThemeName = 'parchment' | 'obsidian' | 'manuscript'
+export type ThemeName = 'parchment' | 'obsidian' | 'manuscript' | 'herbarium' | 'celestial' | 'image-focus' | 'menu-default'
 
 type ThemeContextValue = {
   theme: ThemeName
@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored === 'parchment' || stored === 'obsidian' || stored === 'manuscript') setThemeState(stored)
+    if (stored === 'parchment' || stored === 'obsidian' || stored === 'manuscript' || stored === 'herbarium' || stored === 'celestial' || stored === 'image-focus' || stored === 'menu-default') setThemeState(stored)
   }, [])
 
   useEffect(() => {
