@@ -89,8 +89,8 @@
 
 html[data-theme='parchment'] {
   color-scheme: light;
-  background-color: #e9ddc2;
-  background-image: linear-gradient(rgba(245, 237, 218, 0.72), rgba(245, 237, 218, 0.72)), url('/images/manuscript-plate.png');
+  background-color: #d8c9ab;
+  background-image: linear-gradient(rgba(236, 224, 198, 0.38), rgba(236, 224, 198, 0.38)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg_14-pr-BKOHWRg8rJyOYGEdBJenn3ufKRk5WN.jpg');
   background-attachment: fixed;
   background-size: cover;
 }
@@ -98,7 +98,7 @@ html[data-theme='parchment'] {
 html[data-theme='obsidian'] {
   color-scheme: dark;
   background-color: #10151a;
-  background-image: linear-gradient(rgba(9, 14, 20, 0.72), rgba(9, 14, 20, 0.72)), url('/images/apothecary-plate.png');
+  background-image: linear-gradient(rgba(9, 14, 20, 0.72), rgba(9, 14, 20, 0.72)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_4-pr-5VQ14E3RmRWoyaet6xu2Z6noaKJYax.jpg');
   background-attachment: fixed;
   background-size: cover;
 }
@@ -106,7 +106,7 @@ html[data-theme='obsidian'] {
 html[data-theme='manuscript'] {
   color-scheme: light;
   background-color: #d1b477;
-  background-image: linear-gradient(rgba(220, 193, 143, 0.66), rgba(220, 193, 143, 0.66)), url('/images/herbal-plate.png');
+  background-image: linear-gradient(rgba(220, 193, 143, 0.66), rgba(220, 193, 143, 0.66)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_2-tr-jurqqHaT4Sv2KgZd6jeWjEPNOMCCmh.jpg');
   background-attachment: fixed;
   background-size: cover;
 }
@@ -114,7 +114,7 @@ html[data-theme='manuscript'] {
 html[data-theme='herbarium'] {
   color-scheme: light;
   background-color: #b7c4a0;
-  background-image: linear-gradient(rgba(225, 235, 203, 0.34), rgba(225, 235, 203, 0.34)), url('/images/flora-plate.png');
+  background-image: linear-gradient(rgba(225, 235, 203, 0.34), rgba(225, 235, 203, 0.34)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg_1-g8ZKnyAscfMnd9lG6Ma9aRPdY5ycFI.jpg');
   background-attachment: fixed;
   background-position: center;
   background-size: cover;
@@ -123,7 +123,7 @@ html[data-theme='herbarium'] {
 html[data-theme='celestial'] {
   color-scheme: dark;
   background-color: #17233b;
-  background-image: linear-gradient(rgba(15, 28, 56, 0.3), rgba(15, 28, 56, 0.3)), url('/images/astronomy-plate.png');
+  background-image: linear-gradient(rgba(15, 28, 56, 0.3), rgba(15, 28, 56, 0.3)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg_3-bkRjek71q5ZtnweOyasYsP9T6vu7CH.jpg');
   background-attachment: fixed;
   background-position: center;
   background-size: cover;
@@ -132,7 +132,7 @@ html[data-theme='celestial'] {
 html[data-theme='image-focus'] {
   color-scheme: dark;
   background-color: #202536;
-  background-image: linear-gradient(rgba(20, 24, 36, 0.25), rgba(20, 24, 36, 0.25)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+  background-image: linear-gradient(rgba(20, 24, 36, 0.25), rgba(20, 24, 36, 0.25)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
   background-attachment: fixed;
   background-position: center top;
   background-size: cover;
@@ -141,7 +141,7 @@ html[data-theme='image-focus'] {
 html[data-theme='menu-default'] {
   color-scheme: dark;
   background-color: #171a1d;
-  background-image: linear-gradient(rgba(246, 239, 220, 0.18), rgba(246, 239, 220, 0.18)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+  background-image: linear-gradient(rgba(246, 239, 220, 0.18), rgba(246, 239, 220, 0.18)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
   background-attachment: fixed;
   background-position: center top;
   background-size: cover;
@@ -157,12 +157,15 @@ html[data-theme='menu-default'] body {
   background: transparent;
 }
 
-html[data-theme='parchment'] .bg-background,
+html[data-theme='parchment'] .bg-background {
+  background-color: color-mix(in srgb, #eadfca 18%, transparent) !important;
+}
+
 html[data-theme='manuscript'] .bg-background,
 html[data-theme='obsidian'] .bg-background,
 html[data-theme='herbarium'] .bg-background,
 html[data-theme='celestial'] .bg-background {
-  background-color: color-mix(in srgb, var(--background) 48%, transparent);
+  background-color: color-mix(in srgb, var(--background) 28%, transparent);
 }
 
 html[data-theme='menu-default'] .bg-background {
@@ -335,7 +338,7 @@ html[data-theme='obsidian'] {
   }
   body {
     @apply bg-background text-foreground;
-    background-image: linear-gradient(to bottom, color-mix(in oklch, var(--background) 88%, transparent), color-mix(in oklch, var(--background) 94%, transparent)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tr%20ve%20eng-M5RZkCVDBLlqzIeQHG1BuHHlcuiF8p.png');
+    background-image: linear-gradient(to bottom, color-mix(in oklch, var(--background) 88%, transparent), color-mix(in oklch, var(--background) 94%, transparent)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
     background-attachment: fixed;
     background-position: center top;
     background-size: cover;
