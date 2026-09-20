@@ -17,7 +17,7 @@ export function ArchiveCard({ article }: { article: Article }) {
   const image = images[imageIndex]
 
   return (
-    <Link href={`/article/${article.id}`} className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+    <Link href={`/article/${article.id}`} className="legend-card legend-corners group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
       {image ? <div className="relative aspect-[4/3] overflow-hidden border-b border-border">
         <img src={image} alt={title} crossOrigin="anonymous" className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card/70 via-transparent to-transparent" aria-hidden="true" />
