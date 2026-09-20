@@ -3,6 +3,7 @@ import { ArticleDetail } from '@/components/article-detail'
 import { SiteFooter } from '@/components/site-footer'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
 import { ARTICLE_COLUMNS, type Article, type ArticleTerm } from '@/lib/types'
+import { fetchProductForArticle } from '@/lib/shop'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,5 +17,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ id: st
   ])
   if (error || !data) notFound()
 
-  return <main className="min-h-svh bg-background"><ArticleDetail article={data as unknown as Article} terms={(termData ?? []) as ArticleTerm[]} /><SiteFooter width="narrow" /></main>
+  const product = await fetchProductForArticle(id)
+
+  return <main className="min-h-svh bg-background"><ArticleDetail article={data as unknown as Article} terms={(termData ?? []) as ArticleTerm[]} product={product} /><SiteFooter width="narrow" /></main>
 }

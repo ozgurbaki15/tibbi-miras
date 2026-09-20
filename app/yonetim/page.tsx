@@ -10,6 +10,7 @@ import { ProductManager } from '@/components/admin/product-manager'
 import { SHOP_ADMIN_EMAIL } from '@/lib/shop'
 import { CommunityCommerceManager } from '@/components/admin/community-commerce-manager'
 import { OrderAlertManager } from '@/components/admin/order-alert-manager'
+import { ArticleProductLinker } from '@/components/admin/article-product-linker'
 
 export default function YonetimPage() {
   const { user, loading } = useAuth()
@@ -51,6 +52,7 @@ export default function YonetimPage() {
               Buradan yeni ürün ekleyebilir; mevcut ürünlerin fotoğrafını, bilgilerini, fiyatını ve kategorisini değiştirebilirsiniz. Değişiklikler anında mağazada görünür.
             </p>
             <ProductManager />
+            <ArticleProductLinker />
             <CommunityCommerceManager />
             <OrderAlertManager />
           </>
