@@ -27,11 +27,13 @@ function ProductCard({ product }: { product: ShopProduct }) {
 
   return (
     <article className="flex flex-col overflow-hidden rounded-md border border-border bg-card">
-      <div className="aspect-square overflow-hidden border-b border-border bg-muted">
+      <Link href={`/magaza/${product.id}`} className="aspect-square overflow-hidden border-b border-border bg-muted">
         <img src={product.image || '/placeholder.svg'} alt={name} className="size-full object-cover" />
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h2 className="text-pretty font-serif text-xl font-semibold leading-tight text-card-foreground">{name}</h2>
+        <h2 className="text-pretty font-serif text-xl font-semibold leading-tight text-card-foreground">
+          <Link href={`/magaza/${product.id}`} className="hover:text-primary">{name}</Link>
+        </h2>
         <p className="text-pretty font-sans text-sm leading-relaxed text-muted-foreground">{description}</p>
         <div className="mt-auto flex items-center justify-between gap-3 pt-3">
           <span className="font-serif text-2xl font-semibold text-foreground">{shopPriceLabel(product.priceKurus, lang)}</span>
