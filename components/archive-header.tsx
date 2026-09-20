@@ -20,7 +20,7 @@ export function ArchiveHeader() {
     <header className="border-b border-border">
       <Link
         href="/uyelikler"
-        className="fixed left-4 top-7 z-50 inline-flex items-center gap-2 rounded-full border-2 border-primary bg-primary px-4 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl shadow-primary/30 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        className="legend-seal fixed left-4 top-7 z-50 inline-flex items-center gap-2 rounded-full border-2 border-primary px-4 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         aria-label={lang === 'tr' ? 'Abonelikler sayfasına git' : 'Go to subscriptions'}
       >
         <span aria-hidden="true">★</span>
@@ -63,7 +63,9 @@ export function ArchiveHeader() {
             className="archive-emblem mx-auto block w-full max-w-5xl object-cover object-center"
           />
 
-          <p className="mt-6 font-serif text-2xl italic text-foreground md:text-3xl">
+          <div className="legend-divider" aria-hidden="true" />
+
+          <p className="font-serif text-2xl italic text-foreground md:text-3xl">
             {lang === 'tr' ? 'Tıbbi Miras Arşivi' : 'Medical Heritage Archive'}
           </p>
         </div>

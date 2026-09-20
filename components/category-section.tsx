@@ -33,7 +33,7 @@ function CategoryBranch({ node, depth = 0 }: { node: CategoryNode; depth?: numbe
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="group flex items-center overflow-hidden rounded-xl border border-primary/35 bg-card/75 shadow-[0_8px_24px_rgba(55,35,15,0.12)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary">
+      <div className="legend-tab group flex items-center overflow-hidden rounded-xl border border-primary/35 bg-card/75 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary">
         {hasChildren ? (
           <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} className="flex min-h-14 flex-1 items-center gap-3 px-4 py-3 text-left">
             {open ? <Minus className="size-4 shrink-0 text-primary" aria-hidden="true" /> : <Plus className="size-4 shrink-0 text-primary" aria-hidden="true" />}

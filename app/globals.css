@@ -349,3 +349,119 @@ html[data-theme='obsidian'] {
     background-blend-mode: multiply;
   }
 }
+
+/* ============================================================
+   Legendary tome adornments — theme-agnostic, driven by --primary
+   ============================================================ */
+
+.legend-divider {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  margin: 1.75rem auto;
+  max-width: 15rem;
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--primary) 75%, transparent), transparent);
+}
+
+.legend-divider::after {
+  content: '❖';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  padding: 0 0.85rem;
+  color: var(--primary);
+  font-size: 0.85rem;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+.legend-seal {
+  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--primary) 88%, white 12%), var(--primary) 55%, color-mix(in srgb, var(--primary) 78%, black 22%) 100%) !important;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.35),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.4),
+    0 8px 20px -6px color-mix(in srgb, var(--primary) 55%, transparent);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.legend-nav {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 94%, black 6%), color-mix(in srgb, var(--card) 76%, black 24%)) !important;
+  border-top: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--primary) 22%, transparent) inset,
+    0 12px 28px -18px rgba(0, 0, 0, 0.7);
+}
+
+.legend-nav-link {
+  position: relative;
+  transition: color 0.2s ease, text-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.legend-nav-link:hover,
+.legend-nav-link:focus-visible {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--primary) 65%, transparent);
+}
+
+.legend-tab {
+  position: relative;
+  border-left: 3px solid color-mix(in srgb, var(--primary) 70%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 10%, var(--card)) 0%, var(--card) 55%);
+  transition: border-left-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.legend-tab:hover {
+  border-left-color: var(--primary);
+  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.legend-card {
+  position: relative;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--primary) 28%, transparent),
+    0 18px 40px -22px rgba(0, 0, 0, 0.6);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.legend-card:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent),
+    0 0 26px -4px color-mix(in srgb, var(--primary) 40%, transparent),
+    0 24px 48px -20px rgba(0, 0, 0, 0.65);
+}
+
+.legend-corners::before,
+.legend-corners::after {
+  content: '';
+  position: absolute;
+  width: 1.1rem;
+  height: 1.1rem;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.legend-corners::before {
+  top: 0.4rem;
+  left: 0.4rem;
+  border-top: 2px solid var(--primary);
+  border-left: 2px solid var(--primary);
+}
+
+.legend-corners::after {
+  bottom: 0.4rem;
+  right: 0.4rem;
+  border-bottom: 2px solid var(--primary);
+  border-right: 2px solid var(--primary);
+}
+
+.legend-corners:hover::before,
+.legend-corners:hover::after {
+  opacity: 0.9;
+}
+
+.legend-menu {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--popover) 97%, black 3%), color-mix(in srgb, var(--popover) 82%, black 18%)) !important;
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent) !important;
+  box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.65);
+}
