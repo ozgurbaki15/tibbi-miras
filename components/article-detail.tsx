@@ -9,6 +9,7 @@ import { OriginalTextSection } from '@/components/original-text-section'
 import { ArticleComments } from '@/components/article-comments'
 import { UI, useLanguage } from '@/components/language-provider'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { ArticleProductLinks } from '@/components/article-product-links'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { type Article, type ArticleTerm, articleImages, articleTitle, categoryName } from '@/lib/types'
@@ -32,6 +33,7 @@ export function ArticleDetail({ article, terms = [] }: { article: Article; terms
         {images.length ? <section aria-label="Article images" className="mb-10 flex flex-col gap-5">{images.map((image, index) => <figure key={`${image}-${index}`} className="overflow-hidden rounded-md border border-border bg-card"><img src={image} alt={`${title} — ${index + 1}`} crossOrigin="anonymous" className="block max-h-[760px] w-full object-contain" /><figcaption className="border-t border-border px-4 py-2 text-center font-sans text-xs text-muted-foreground">{index + 1} / {images.length}</figcaption></figure>)}</section> : null}
         <ArticleTabs article={article} terms={terms} linksEnabled={linksEnabled} onToggleLinks={() => setLinksEnabled((value) => !value)} />
         <OriginalTextSection article={article} terms={terms} linksEnabled={linksEnabled} />
+        <ArticleProductLinks articleId={String(article.id)} />
         <ArticleComments articleId={String(article.id)} />
       </article>
       </div>
