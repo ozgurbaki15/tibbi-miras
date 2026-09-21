@@ -10,7 +10,7 @@ const themes: { id: ThemeName; label: string; icon: typeof Sun }[] = [
   { id: 'herbarium', label: 'Herbaryum', icon: Leaf },
   { id: 'celestial', label: 'Göksel Levha', icon: Sparkles },
   { id: 'image-focus', label: 'Resim Odaklı · %75 şeffaf', icon: Palette },
-  { id: 'menu-default', label: 'Menu_default · Makale resmi', icon: ScrollText },
+  { id: 'menu-default', label: 'Kadim Levha', icon: ScrollText },
 ]
 
 export function ThemeSwitcher() {

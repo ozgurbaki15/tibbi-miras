@@ -141,7 +141,7 @@ html[data-theme='image-focus'] {
 html[data-theme='menu-default'] {
   color-scheme: dark;
   background-color: #171a1d;
-  background-image: linear-gradient(rgba(246, 239, 220, 0.18), rgba(246, 239, 220, 0.18)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
+  background-image: linear-gradient(rgba(246, 239, 220, 0.10), rgba(246, 239, 220, 0.10)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
   background-attachment: fixed;
   background-position: center top;
   background-size: cover;
