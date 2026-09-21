@@ -15,11 +15,17 @@ export function ArticleProductLinks({ articleId }: { articleId: string }) {
   const { add } = useCart()
   const { lang } = useLanguage()
   const [links, setLinks] = useState<LinkRow[]>([])
+  const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
     let active = true
-    supabase.from('tma_article_product_links').select('product_id, article_first, product_first').eq('article_id', articleId).then(({ data }) => {
-      if (active) setLinks((data as LinkRow[] | null) ?? [])
+    supabase.from('tma_article_product_links').select('product_id, article_first, product_first').eq('article_id', articleId).then(({ data, error }) => {
+      if (!active) return
+      if (error) {
+        setLoadError(error.message)
+        return
+      }
+      setLinks((data as LinkRow[] | null) ?? [])
     })
     return () => { active = false }
   }, [articleId])
