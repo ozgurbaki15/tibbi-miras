@@ -1,15 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import type { ShopCategory, ShopProduct } from '@/lib/shop'
-
-type ShopResponse = { products: ShopProduct[]; categories: ShopCategory[] }
-
-async function loadShopData(): Promise<ShopResponse> {
-  const response = await fetch('/api/shop', { next: { revalidate: 300 } })
-  if (!response.ok) throw new Error('Mağaza verileri yüklenemedi.')
-  return response.json() as Promise<ShopResponse>
-}
+import { fetchShopData, type ShopCategory, type ShopProduct } from '@/lib/shop'
 
 type ProductsContextValue = {
   products: ShopProduct[]
@@ -27,7 +19,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    const { products: nextProducts, categories: nextCategories } = await loadShopData()
+    const { products: nextProducts, categories: nextCategories } = await fetchShopData()
     setProducts(nextProducts)
     setCategories(nextCategories)
     setLoading(false)
@@ -35,7 +27,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true
-    loadShopData()
+    fetchShopData()
       .then(({ products: nextProducts, categories: nextCategories }) => {
         if (!active) return
         setProducts(nextProducts)
