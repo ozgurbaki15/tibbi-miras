@@ -10,6 +10,7 @@ import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
 import { useProducts } from '@/components/products-provider'
 import { shopPriceLabel, type ShopProduct } from '@/lib/shop'
+import { ProductRelatedArticles } from '@/components/product-related-articles'
 
 function ProductCard({ product }: { product: ShopProduct }) {
   const { lang } = useLanguage()
@@ -48,6 +49,7 @@ function ProductCard({ product }: { product: ShopProduct }) {
           {added ? <Check className="size-4" /> : <ShoppingCart className="size-4" />}
           {added ? (lang === 'tr' ? 'Sepete eklendi' : 'Added to cart') : lang === 'tr' ? 'Sepete ekle' : 'Add to cart'}
         </button>
+        <ProductRelatedArticles productId={product.id} />
       </div>
     </article>
   )
