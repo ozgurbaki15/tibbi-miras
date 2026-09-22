@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
@@ -18,44 +18,48 @@ export default function SearchPage() {
   const { lang } = useLanguage()
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    const term = query.trim()
+    if (!term) {
+      setArticles([])
       setLoading(false)
       return
     }
 
-    supabase
-      .from('articles')
-      .select(ARTICLE_COLUMNS)
-      .eq('is_published', true)
-      .eq('is_hidden', false)
-      .order('id', { ascending: true })
-      .then(({ data }) => {
+    if (!isSupabaseConfigured) {
+      setArticles([])
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    const timer = window.setTimeout(async () => {
+      const escaped = term.replace(/[%(),]/g, ' ')
+      const fields = includeContent
+        ? `title_tr.ilike.%${escaped}%,title_en.ilike.%${escaped}%,free_content_tr.ilike.%${escaped}%,free_content_en.ilike.%${escaped}%,original_text.ilike.%${escaped}%`
+        : `title_tr.ilike.%${escaped}%,title_en.ilike.%${escaped}%`
+
+      const { data, error } = await supabase
+        .from('articles')
+        .select(ARTICLE_COLUMNS)
+        .eq('is_published', true)
+        .eq('is_hidden', false)
+        .or(fields)
+        .order('id', { ascending: true })
+        .limit(100)
+
+      if (error) {
+        console.log('[v0] Search query error:', error.message)
+        setArticles([])
+      } else {
         setArticles((data ?? []) as unknown as Article[])
-        setLoading(false)
-      })
-  }, [])
+      }
+      setLoading(false)
+    }, 350)
 
-  const results = useMemo(() => {
-    const term = query.trim().toLocaleLowerCase('tr-TR')
-    if (!term) return articles
+    return () => window.clearTimeout(timer)
+  }, [query, includeContent])
 
-    return articles.filter((article) => {
-      const title = `${article.title_tr ?? ''} ${article.title_en ?? ''}`.toLocaleLowerCase('tr-TR')
-      if (title.includes(term)) return true
-      if (!includeContent) return false
-
-      const content = [
-        article.free_content_tr,
-        article.free_content_en,
-        article.original_text,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLocaleLowerCase('tr-TR')
-
-      return content.includes(term)
-    })
-  }, [articles, query, includeContent])
+  const results = articles
 
   return (
     <main className="min-h-svh bg-background">
@@ -70,7 +74,7 @@ export default function SearchPage() {
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={lang === 'tr' ? 'Makale başlığı ara…' : 'Search article titles…'}
+            placeholder={lang === 'tr' ? 'Tüm makalelerde ara…' : 'Search all articles…'}
             aria-label={lang === 'tr' ? 'Makale ara' : 'Search articles'}
             className="w-full rounded-md border border-border bg-card py-4 pl-12 pr-4 font-sans text-sm text-foreground outline-none focus:border-primary"
           />
@@ -97,6 +101,8 @@ export default function SearchPage() {
         </div>
         {loading ? (
           <p className="font-serif text-xl text-muted-foreground">{lang === 'tr' ? 'Arşiv yükleniyor…' : 'Loading archive…'}</p>
+        ) : !query.trim() ? (
+          <p className="rounded-md border border-dashed border-border py-16 text-center font-serif text-xl text-muted-foreground">{lang === 'tr' ? 'Aramak için bir kelime yazın.' : 'Type a word to search the archive.'}</p>
         ) : (
           <>
             <p className="mb-5 font-sans text-xs uppercase tracking-wider text-muted-foreground">{results.length} sonuç</p>
