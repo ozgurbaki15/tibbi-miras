@@ -9,6 +9,11 @@ type ArchiveData = {
   categories: Category[]
 }
 
+type ArticlePage = {
+  articles: Article[]
+  hasMore: boolean
+}
+
 const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? ''
 const publicSupabase = createClient(
   /^https?:\/\//i.test(configuredUrl) ? configuredUrl : 'https://placeholder.supabase.co',
@@ -44,3 +49,30 @@ export const getPublicArchiveData = unstable_cache(loadArchiveData, ['public-arc
   revalidate: 300,
   tags: ['public-archive'],
 })
+
+async function loadArticlePage(offset: number, limit: number): Promise<ArticlePage> {
+  const { data, error } = await publicSupabase
+    .from('articles')
+    .select(ARTICLE_COLUMNS)
+    .eq('is_published', true)
+    .eq('is_hidden', false)
+    .order('id', { ascending: true })
+    .range(offset, offset + limit)
+
+  if (error) throw new Error(error.message)
+  const rows = ((data ?? []) as unknown as Article[])
+  return { articles: rows.slice(0, limit), hasMore: rows.length > limit }
+}
+
+export const getPublicArticlePage = unstable_cache(loadArticlePage, ['public-articles-page-v1'], {
+  revalidate: 300,
+  tags: ['public-archive'],
+})
+
+export async function getPublicArchiveFirstPage(limit = 30): Promise<ArchiveData & { hasMore: boolean }> {
+  const [categories, page] = await Promise.all([
+    getPublicArchiveData().then((data) => data.categories),
+    getPublicArticlePage(0, limit),
+  ])
+  return { categories, articles: page.articles, hasMore: page.hasMore }
+}

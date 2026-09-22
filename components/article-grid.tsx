@@ -1,16 +1,44 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import { ArchiveCard } from '@/components/archive-card'
 import { UI, useLanguage } from '@/components/language-provider'
 import { type Article, articleTitle } from '@/lib/types'
 
-export function ArticleGrid({ articles }: { articles: Article[] }) {
+export function ArticleGrid({ articles: initialArticles, initialHasMore }: { articles: Article[]; initialHasMore: boolean }) {
   const { lang } = useLanguage()
+  const [articles, setArticles] = useState(initialArticles)
+  const [hasMore, setHasMore] = useState(initialHasMore)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
   const t = UI[lang]
   const [query, setQuery] = useState('')
   const [includeContent, setIncludeContent] = useState(false)
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const response = await fetch(`/api/public/articles?offset=${articles.length}`)
+      if (!response.ok) throw new Error('Daha fazla makale yüklenemedi.')
+      const page = (await response.json()) as { articles: Article[]; hasMore: boolean }
+      setArticles((current) => [...current, ...page.articles])
+      setHasMore(page.hasMore)
+    } finally {
+      setLoadingMore(false)
+    }
+  }, [articles.length, hasMore, loadingMore])
+
+  useEffect(() => {
+    const target = loadMoreRef.current
+    if (!target || !hasMore) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void loadMore()
+    }, { rootMargin: '600px' })
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [hasMore, loadMore])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase(lang)
@@ -80,6 +108,12 @@ export function ArticleGrid({ articles }: { articles: Article[] }) {
           {'” '}
           {t.noResults}
         </p>
+      )}
+
+      {hasMore && (
+        <div ref={loadMoreRef} className="flex min-h-16 items-center justify-center pt-8" aria-live="polite">
+          {loadingMore && <p className="font-sans text-sm text-muted-foreground">{lang === 'tr' ? 'Daha fazla eser yükleniyor…' : 'Loading more entries…'}</p>}
+        </div>
       )}
     </section>
   )

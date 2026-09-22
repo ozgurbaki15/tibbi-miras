@@ -4,7 +4,7 @@ import { ArticleGrid } from '@/components/article-grid'
 import { CategorySection } from '@/components/category-section'
 import { SiteFooter } from '@/components/site-footer'
 import { isSupabaseConfigured } from '@/lib/supabase/client'
-import { getPublicArchiveData } from '@/lib/public-data'
+import { getPublicArchiveFirstPage } from '@/lib/public-data'
 import type { Article, Category } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -13,12 +13,14 @@ export default async function Page() {
   let articles: Article[] = []
   let categories: Category[] = []
   let error: Error | null = null
+  let hasMore = false
 
   if (isSupabaseConfigured) {
     try {
-      const cached = await getPublicArchiveData()
+      const cached = await getPublicArchiveFirstPage(30)
       articles = cached.articles
       categories = cached.categories
+      hasMore = cached.hasMore
     } catch (caught) {
       error = caught instanceof Error ? caught : new Error('Public archive data could not be loaded.')
       console.log('[v0] Cached archive data fetch error:', error.message)
@@ -36,7 +38,7 @@ export default async function Page() {
       ) : (
         <>
           <CategorySection categories={categories} />
-          <ArticleGrid articles={articles} />
+          <ArticleGrid articles={articles} initialHasMore={hasMore} />
         </>
       )}
       <SiteFooter />
