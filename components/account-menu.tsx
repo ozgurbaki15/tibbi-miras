@@ -18,6 +18,7 @@ export function AccountMenu() {
     return (
       <Link
         href="/login"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
         className="inline-flex items-center gap-2 rounded-full border border-primary/60 bg-card px-3 py-2 font-sans text-[10px] uppercase tracking-[0.16em] text-foreground transition-all hover:border-primary hover:bg-primary/10 hover:text-primary"
       >
         <LogIn className="size-3.5" aria-hidden="true" />
@@ -40,6 +41,7 @@ export function AccountMenu() {
       {isShopAdmin ? (
         <Link
           href="/yonetim"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
           title="Ürün yönetimi"
           aria-label="Ürün yönetimi"
           className="inline-flex size-9 items-center justify-center rounded-full border border-primary/60 bg-primary/10 text-primary transition-colors hover:bg-primary/20"
@@ -49,6 +51,7 @@ export function AccountMenu() {
       ) : null}
       <Link
         href="/settings"
+        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
         title="Hesap ve üyelik ayarları"
         className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 font-sans text-[10px] uppercase tracking-[0.14em] transition-all hover:brightness-110 ${tierClass}`}
       >
