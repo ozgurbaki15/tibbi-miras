@@ -8,6 +8,7 @@ import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { CheckoutButton } from '@/components/checkout-button'
+import { MembershipCodeRedeemer } from '@/components/membership-code-redeemer'
 import { useLanguage } from '@/components/language-provider'
 import { useAuth } from '@/components/auth-provider'
 import { getProduct, priceLabel, type Product } from '@/lib/products'
@@ -82,6 +83,10 @@ function OrderSummary() {
           {tr ? '’nı kabul etmiş olursunuz.' : '.'}
         </p>
         <Link href="/uyelikler" className="text-center font-sans text-xs uppercase tracking-wider text-muted-foreground hover:text-primary">{tr ? 'Planlara geri dön' : 'Back to plans'}</Link>
+      </div>
+
+      <div className="lg:col-span-2">
+        <MembershipCodeRedeemer compact />
       </div>
     </div>
   )

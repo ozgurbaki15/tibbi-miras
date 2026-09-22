@@ -6,6 +6,7 @@ import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useLanguage } from '@/components/language-provider'
+import { MembershipCodeRedeemer } from '@/components/membership-code-redeemer'
 import { PRODUCTS, priceLabel, type Product } from '@/lib/products'
 
 function periodLabel(product: Product, tr: boolean): string {
@@ -60,6 +61,10 @@ export default function MembershipStorePage() {
               : 'Premium and Platin memberships unlock extended texts and exclusive works. All prices include VAT. Memberships bought in the mobile app also work on the website.'}
           </p>
         </header>
+
+        <div className="mx-auto mb-12 max-w-2xl">
+          <MembershipCodeRedeemer compact />
+        </div>
 
         <h2 className="mb-4 font-serif text-2xl text-foreground">{tr ? 'Abonelikler' : 'Subscriptions'}</h2>
         <div className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
