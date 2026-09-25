@@ -8,7 +8,7 @@ import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useLanguage } from '@/components/language-provider'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
-import { ARTICLE_COLUMNS, articleTitle, type Article } from '@/lib/types'
+import { ARTICLE_COLUMNS, ARTICLE_LIST_COLUMNS, articleTitle, type Article } from '@/lib/types'
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')
@@ -40,7 +40,7 @@ export default function SearchPage() {
 
       const { data, error } = await supabase
         .from('articles')
-        .select(ARTICLE_COLUMNS)
+        .select(includeContent ? ARTICLE_COLUMNS : ARTICLE_LIST_COLUMNS)
         .eq('is_published', true)
         .eq('is_hidden', false)
         .or(fields)

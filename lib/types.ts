@@ -33,6 +33,11 @@ export type ArticleTerm = {
 export const ARTICLE_COLUMNS =
   'id, title_tr, title_en, image_url, free_content_tr, free_content_en, original_text, premium_content_tr, premium_content_en, category_id, is_published, is_hidden, categories ( id, name_tr, name_en )'
 
+// Archive cards never render article bodies. Keeping body columns out of the
+// public list response prevents every homepage visit from downloading the archive.
+export const ARTICLE_LIST_COLUMNS =
+  'id, title_tr, title_en, image_url, category_id, is_published, is_hidden, categories ( id, name_tr, name_en )'
+
 export function articleImages(imageValue: string | string[] | null): string[] {
   if (!imageValue) return []
   if (Array.isArray(imageValue)) {

@@ -2,7 +2,7 @@ import 'server-only'
 
 import { unstable_cache } from 'next/cache'
 import { createClient } from '@supabase/supabase-js'
-import { ARTICLE_COLUMNS, type Article, type Category } from '@/lib/types'
+import { ARTICLE_LIST_COLUMNS, type Article, type Category } from '@/lib/types'
 
 type ArchiveData = {
   articles: Article[]
@@ -25,7 +25,7 @@ async function loadArchiveData(): Promise<ArchiveData> {
   const [articleResult, categoryResult] = await Promise.all([
     publicSupabase
       .from('articles')
-      .select(ARTICLE_COLUMNS)
+      .select(ARTICLE_LIST_COLUMNS)
       .eq('is_published', true)
       .eq('is_hidden', false)
       .order('id', { ascending: true }),
@@ -53,7 +53,7 @@ export const getPublicArchiveData = unstable_cache(loadArchiveData, ['public-arc
 async function loadArticlePage(offset: number, limit: number): Promise<ArticlePage> {
   const { data, error } = await publicSupabase
     .from('articles')
-    .select(ARTICLE_COLUMNS)
+    .select(ARTICLE_LIST_COLUMNS)
     .eq('is_published', true)
     .eq('is_hidden', false)
     .order('id', { ascending: true })

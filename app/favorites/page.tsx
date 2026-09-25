@@ -10,7 +10,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { useAuth } from '@/components/auth-provider'
 import { useLanguage } from '@/components/language-provider'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
-import { ARTICLE_COLUMNS, type Article } from '@/lib/types'
+import { ARTICLE_LIST_COLUMNS, type Article } from '@/lib/types'
 
 export default function FavoritesPage() {
   const { user, loading: authLoading } = useAuth()
@@ -63,7 +63,7 @@ export default function FavoritesPage() {
       }
       const { data: articleRows } = await supabase
         .from('articles')
-        .select(ARTICLE_COLUMNS)
+        .select(ARTICLE_LIST_COLUMNS)
         .in('id', ids)
         .eq('is_published', true)
         .eq('is_hidden', false)

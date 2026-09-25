@@ -5,7 +5,7 @@ import { ArchiveNavigation } from '@/components/archive-navigation'
 import { ArchiveCard } from '@/components/archive-card'
 import { SiteFooter } from '@/components/site-footer'
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client'
-import { ARTICLE_COLUMNS, type Article, type Category } from '@/lib/types'
+import { ARTICLE_LIST_COLUMNS, type Article, type Category } from '@/lib/types'
 import { LanguageAwareCategoryTitle } from '@/components/language-aware-category-title'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +16,7 @@ export default async function CategoryDetailPage({ params }: Props) {
   const [categoryResult, articleResult] = isSupabaseConfigured
     ? await Promise.all([
         supabase.from('categories').select('id, name_tr, name_en, parent_id, sort_order, is_adult').eq('id', id).maybeSingle(),
-        supabase.from('articles').select(ARTICLE_COLUMNS).eq('category_id', id).eq('is_published', true).eq('is_hidden', false).order('id', { ascending: true }),
+        supabase.from('articles').select(ARTICLE_LIST_COLUMNS).eq('category_id', id).eq('is_published', true).eq('is_hidden', false).order('id', { ascending: true }),
       ])
     : [{ data: null, error: null }, { data: null, error: null }]
   const category = categoryResult.data as Category | null
