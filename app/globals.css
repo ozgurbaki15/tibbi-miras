@@ -88,9 +88,9 @@
 }
 
 html[data-theme='parchment'] {
-  color-scheme: light;
-  background-color: #d8c9ab;
-  background-image: linear-gradient(rgba(236, 224, 198, 0.38), rgba(236, 224, 198, 0.38)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg_14-pr-BKOHWRg8rJyOYGEdBJenn3ufKRk5WN.jpg');
+  color-scheme: dark;
+  background-color: #171a1d;
+  background-image: linear-gradient(rgba(246, 239, 220, 0.10), rgba(246, 239, 220, 0.10)), url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/menu_default-X1A3ykGym24a8kovyNgGZXprUQha06.jpg');
   background-attachment: fixed;
   background-size: cover;
 }
