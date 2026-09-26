@@ -11,21 +11,32 @@ export function ArchiveNavigation() {
     : { home: 'Home', categories: 'Categories', search: 'Search', favorites: 'Favorites', memberships: 'Memberships', store: 'Store', settings: 'Settings' }
 
   const items = [
-    { href: '/#home-content', label: labels.home, icon: BookOpen },
-    { href: '/favorites#page-content', label: labels.favorites, icon: Heart },
-    { href: '/categories#page-content', label: labels.categories, icon: FolderTree },
-    { href: '/search#page-content', label: labels.search, icon: Search },
+    { href: '/', label: labels.home, icon: BookOpen },
+    { href: '/favorites', label: labels.favorites, icon: Heart },
+    { href: '/categories', label: labels.categories, icon: FolderTree },
+    { href: '/search', label: labels.search, icon: Search },
 
-    { href: '/uyelikler#page-content', label: labels.memberships, icon: Crown },
-    { href: '/magaza#page-content', label: labels.store, icon: ShoppingBag },
-    { href: '/settings#page-content', label: labels.settings, icon: Settings },
+    { href: '/uyelikler', label: labels.memberships, icon: Crown },
+    { href: '/magaza', label: labels.store, icon: ShoppingBag },
+    { href: '/settings', label: labels.settings, icon: Settings },
   ]
 
   return (
     <nav aria-label={lang === 'tr' ? 'Ana navigasyon' : 'Main navigation'} className="legend-nav sticky top-0 z-30 w-full border-b border-primary/30 backdrop-blur">
       <div className="mx-auto grid max-w-6xl grid-cols-4 gap-1 px-2 py-2 sm:flex sm:justify-center sm:gap-1 sm:overflow-x-auto sm:px-6 sm:py-3">
         {items.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} scroll className="legend-nav-link inline-flex min-w-0 items-center justify-center gap-1 rounded-md px-1 py-2 text-center font-sans text-[9px] uppercase leading-tight tracking-wide text-primary-foreground/75 transition-colors hover:bg-primary/15 hover:text-primary sm:shrink-0 sm:gap-2 sm:px-3 sm:text-xs sm:tracking-wider">
+          <Link
+            key={href}
+            href={href}
+            scroll={false}
+            onClick={() => {
+              window.setTimeout(() => {
+                const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+                window.scrollTo({ top: Math.min(420, maxScroll), left: 0, behavior: 'auto' })
+              }, 350)
+            }}
+            className="legend-nav-link inline-flex min-w-0 items-center justify-center gap-1 rounded-md px-1 py-2 text-center font-sans text-[9px] uppercase leading-tight tracking-wide text-primary-foreground/75 transition-colors hover:bg-primary/15 hover:text-primary sm:shrink-0 sm:gap-2 sm:px-3 sm:text-xs sm:tracking-wider"
+          >
             <Icon className="size-4" aria-hidden="true" />
             {label}
           </Link>
