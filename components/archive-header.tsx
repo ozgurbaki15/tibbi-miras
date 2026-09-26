@@ -27,7 +27,7 @@ export function ArchiveHeader() {
         {lang === 'tr' ? 'Abonelikler' : 'Subscriptions'}
       </Link>
 
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-end gap-3 px-6 pt-20 sm:justify-between sm:pt-6">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-end gap-1 px-2 pt-14 sm:justify-between sm:gap-3 sm:px-6 sm:pt-6">
         <AccountMenu />
         <div className="flex items-center gap-3">
           <a
@@ -44,23 +44,23 @@ export function ArchiveHeader() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 md:px-6 md:pb-16 md:pt-8">
+      <div className="mx-auto max-w-6xl px-2 pb-3 pt-2 sm:px-4 sm:pb-10 sm:pt-6 md:px-6 md:pb-16 md:pt-8">
         <div className="text-center">
           <Link
             href="/"
-            className="mb-4 inline-block rounded-md font-sans text-2xl font-semibold tracking-[0.22em] text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:text-3xl"
+            className="mb-2 inline-block rounded-md font-sans text-xl font-semibold tracking-[0.16em] sm:mb-4 sm:text-2xl sm:tracking-[0.22em] text-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:text-3xl"
             aria-label={lang === 'tr' ? 'Anasayfaya git' : 'Go to home'}
           >
             {t.eyebrow}
           </Link>
-          <h1 className="mb-6 text-balance font-serif text-3xl font-semibold leading-tight text-foreground md:text-5xl">
+          <h1 className="mb-1 text-balance font-serif text-xl font-semibold leading-tight text-foreground sm:mb-6 sm:text-3xl md:text-5xl">
             {lang === 'tr' ? 'Kadim Tıbbın İhyası' : 'Reviving Ancient Medicine'}
           </h1>
 
           <img
             src={emblemImage}
             alt={lang === 'tr' ? 'Özgür Tıp amblemi' : 'Freed Science emblem'}
-            className="archive-emblem mx-auto block w-full max-w-5xl object-cover object-center"
+            className="archive-emblem mx-auto block max-h-32 w-full max-w-5xl object-contain object-center sm:max-h-none sm:object-cover"
           />
 
           <div className="legend-divider" aria-hidden="true" />
