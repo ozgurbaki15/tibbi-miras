@@ -8,7 +8,6 @@ import { CartSidebar } from '@/components/cart-sidebar'
 import { ProductsProvider } from '@/components/products-provider'
 import { EntitlementsProvider } from '@/components/entitlements-provider'
 import { ThemeProvider } from '@/components/theme-provider'
-import { RouteScrollReset } from '@/components/route-scroll-reset'
 import Script from 'next/script'
 import './globals.css'
 
@@ -59,7 +58,6 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <ThemeProvider>
-          <RouteScrollReset />
           <AuthProvider>
             <EntitlementsProvider>
               <LanguageProvider>

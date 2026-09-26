@@ -36,10 +36,10 @@ export default async function Page() {
       ) : error ? (
         <section className="mx-auto max-w-6xl px-6 py-20"><div className="rounded-md border border-destructive/40 bg-destructive/10 p-6 font-mono text-xs text-foreground"><strong className="font-serif text-lg text-destructive">Supabase Fetch Error</strong><pre className="mt-4 whitespace-pre-wrap">{error.message}</pre></div></section>
       ) : (
-        <>
+        <div id="home-content" className="scroll-mt-16">
           <CategorySection categories={categories} />
           <ArticleGrid articles={articles} initialHasMore={hasMore} />
-        </>
+        </div>
       )}
       <SiteFooter />
     </main>

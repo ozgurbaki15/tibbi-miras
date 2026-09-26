@@ -11,7 +11,7 @@ export function ArchiveNavigation() {
     : { home: 'Home', categories: 'Categories', search: 'Search', favorites: 'Favorites', memberships: 'Memberships', store: 'Store', settings: 'Settings' }
 
   const items = [
-    { href: '/', label: labels.home, icon: BookOpen },
+    { href: '/#home-content', label: labels.home, icon: BookOpen },
     { href: '/categories', label: labels.categories, icon: FolderTree },
     { href: '/search', label: labels.search, icon: Search },
     { href: '/favorites', label: labels.favorites, icon: Heart },
