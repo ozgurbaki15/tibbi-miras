@@ -63,7 +63,7 @@ export default function RootLayout({
               <LanguageProvider>
               <ProductsProvider>
               <CartProvider>
-              <div className="flex-grow">{children}</div>
+              <div id="page-content" className="flex-grow scroll-mt-2">{children}</div>
               <CartSidebar />
               <footer className="mt-12 w-full border-t border-border/40 bg-background/95 py-6">
                 <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row">

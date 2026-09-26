@@ -81,7 +81,7 @@ export default function FavoritesPage() {
     <main className="min-h-svh bg-background">
       <ArchiveHeader />
       <ArchiveNavigation />
-      <section id="page-content" className="mx-auto max-w-6xl scroll-mt-2 px-6 py-14">
+      <section className="mx-auto max-w-6xl px-6 py-14">
         <p className="mb-2 font-sans text-xs uppercase tracking-[0.25em] text-primary">{t.eyebrow}</p>
         <div className="mb-10 flex items-center gap-3">
           <Heart className="size-8 text-primary" aria-hidden="true" />
