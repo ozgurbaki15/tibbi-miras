@@ -2,7 +2,7 @@ import 'server-only'
 
 import { unstable_cache } from 'next/cache'
 import { createClient } from '@supabase/supabase-js'
-import { ARTICLE_COLUMNS, type Article, type Category } from '@/lib/types'
+import { ARTICLE_COLUMNS, ARTICLE_LIST_COLUMNS, type Article, type ArticleTerm, type Category } from '@/lib/types'
 
 type ArchiveData = {
   articles: Article[]
@@ -25,7 +25,7 @@ async function loadArchiveData(): Promise<ArchiveData> {
   const [articleResult, categoryResult] = await Promise.all([
     publicSupabase
       .from('articles')
-      .select(ARTICLE_COLUMNS)
+      .select(ARTICLE_LIST_COLUMNS)
       .eq('is_published', true)
       .eq('is_hidden', false)
       .order('id', { ascending: true }),
@@ -53,7 +53,7 @@ export const getPublicArchiveData = unstable_cache(loadArchiveData, ['public-arc
 async function loadArticlePage(offset: number, limit: number): Promise<ArticlePage> {
   const { data, error } = await publicSupabase
     .from('articles')
-    .select(ARTICLE_COLUMNS)
+    .select(ARTICLE_LIST_COLUMNS)
     .eq('is_published', true)
     .eq('is_hidden', false)
     .order('id', { ascending: true })
@@ -65,6 +65,22 @@ async function loadArticlePage(offset: number, limit: number): Promise<ArticlePa
 }
 
 export const getPublicArticlePage = unstable_cache(loadArticlePage, ['public-articles-page-v1'], {
+  revalidate: 300,
+  tags: ['public-archive'],
+})
+
+async function loadPublicArticleDetail(id: string): Promise<{ article: Article | null; terms: ArticleTerm[] }> {
+  const [{ data: article, error: articleError }, { data: terms, error: termsError }] = await Promise.all([
+    publicSupabase.from('articles').select(ARTICLE_COLUMNS).eq('id', id).eq('is_published', true).eq('is_hidden', false).maybeSingle(),
+    publicSupabase.from('article_terms').select('article_id, aliases'),
+  ])
+
+  if (articleError) throw new Error(articleError.message)
+  if (termsError) throw new Error(termsError.message)
+  return { article: article as unknown as Article | null, terms: (terms ?? []) as ArticleTerm[] }
+}
+
+export const getPublicArticleDetail = unstable_cache(loadPublicArticleDetail, ['public-article-detail-v1'], {
   revalidate: 300,
   tags: ['public-archive'],
 })

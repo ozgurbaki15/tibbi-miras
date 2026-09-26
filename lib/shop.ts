@@ -79,8 +79,8 @@ export async function fetchShopData(): Promise<{ products: ShopProduct[]; catego
   if (!isSupabaseConfigured) return { products: [], categories: [] }
 
   const [categoriesResult, productsResult] = await Promise.all([
-    supabase.from('shop_categories').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
-    supabase.from('shop_products').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
+    supabase.from('shop_categories').select('id, name, name_en, parent_id, sort_order').order('sort_order', { ascending: true }),
+    supabase.from('shop_products').select('id, category_id, name, name_en, description, description_en, image_url, price_kurus, max_quantity, in_stock, sort_order').order('sort_order', { ascending: true }),
   ])
 
   if (categoriesResult.error) console.log('[v0] shop categories fetch error', categoriesResult.error.message)
