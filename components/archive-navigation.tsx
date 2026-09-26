@@ -12,19 +12,20 @@ export function ArchiveNavigation() {
 
   const items = [
     { href: '/#home-content', label: labels.home, icon: BookOpen },
+    { href: '/favorites#page-content', label: labels.favorites, icon: Heart },
     { href: '/categories', label: labels.categories, icon: FolderTree },
     { href: '/search', label: labels.search, icon: Search },
-    { href: '/favorites', label: labels.favorites, icon: Heart },
+
     { href: '/uyelikler', label: labels.memberships, icon: Crown },
     { href: '/magaza', label: labels.store, icon: ShoppingBag },
     { href: '/settings', label: labels.settings, icon: Settings },
   ]
 
   return (
-    <nav aria-label={lang === 'tr' ? 'Ana navigasyon' : 'Main navigation'} className="legend-nav sticky top-0 z-30 border-b border-primary/30 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl justify-center gap-1 overflow-x-auto px-6 py-3">
+    <nav aria-label={lang === 'tr' ? 'Ana navigasyon' : 'Main navigation'} className="legend-nav sticky top-0 z-30 w-full border-b border-primary/30 backdrop-blur">
+      <div className="mx-auto grid max-w-6xl grid-cols-4 gap-1 px-2 py-2 sm:flex sm:justify-center sm:gap-1 sm:overflow-x-auto sm:px-6 sm:py-3">
         {items.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} scroll className="legend-nav-link inline-flex shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-center font-sans text-xs uppercase tracking-wider text-primary-foreground/75 transition-colors hover:bg-primary/15 hover:text-primary">
+          <Link key={href} href={href} scroll onClick={() => window.setTimeout(() => document.getElementById('page-content')?.scrollIntoView({ block: 'start' }), 250)} className="legend-nav-link inline-flex min-w-0 items-center justify-center gap-1 rounded-md px-1 py-2 text-center font-sans text-[9px] uppercase leading-tight tracking-wide text-primary-foreground/75 transition-colors hover:bg-primary/15 hover:text-primary sm:shrink-0 sm:gap-2 sm:px-3 sm:text-xs sm:tracking-wider">
             <Icon className="size-4" aria-hidden="true" />
             {label}
           </Link>
