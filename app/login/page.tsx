@@ -21,6 +21,17 @@ export default function LoginPage() {
   // Set once a signup succeeds so we can show a prominent "verify email" screen.
   const [awaitingActivation, setAwaitingActivation] = useState(false)
 
+  // Account-screen password creation for users who signed up via Google only.
+  const [newPassword, setNewPassword] = useState('')
+  const [newConfirm, setNewConfirm] = useState('')
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [passwordMessage, setPasswordMessage] = useState('')
+  const [passwordBusy, setPasswordBusy] = useState(false)
+  const [passwordSet, setPasswordSet] = useState(false)
+  const hasPasswordIdentity = Boolean(
+    user?.identities?.some((identity) => identity.provider === 'email') ?? user?.app_metadata?.providers?.includes('email'),
+  )
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const error = params.get('error')
@@ -62,6 +73,21 @@ export default function LoginPage() {
     setBusy(false)
   }
 
+  async function submitNewPassword(event: FormEvent) {
+    event.preventDefault()
+    if (newPassword !== newConfirm) { setPasswordMessage('Şifreler eşleşmiyor. Lütfen iki alana da aynı şifreyi yazın.'); return }
+    setPasswordBusy(true)
+    setPasswordMessage('')
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) setPasswordMessage(error.message)
+    else {
+      setPasswordSet(true)
+      setNewPassword('')
+      setNewConfirm('')
+    }
+    setPasswordBusy(false)
+  }
+
   async function google() {
     if (!isSupabaseConfigured) { setMessage('Giriş sistemi yapılandırılmamış.'); return }
     setBusy(true)
@@ -84,9 +110,65 @@ export default function LoginPage() {
         </div>
 
         {user ? (
-          <div className="space-y-5 rounded-md border border-border bg-card p-6 text-center">
-            <p className="font-sans text-sm text-muted-foreground">{user.email}</p>
-            <button onClick={() => signOut()} className="w-full rounded-md border border-border px-4 py-3 font-sans text-xs uppercase tracking-wider text-foreground hover:border-primary">Çıkış yap</button>
+          <div className="space-y-6">
+            <div className="space-y-5 rounded-md border border-border bg-card p-6 text-center">
+              <p className="font-sans text-sm text-muted-foreground">{user.email}</p>
+              <button onClick={() => signOut()} className="w-full rounded-md border border-border px-4 py-3 font-sans text-xs uppercase tracking-wider text-foreground hover:border-primary">Çıkış yap</button>
+            </div>
+
+            {!hasPasswordIdentity ? (
+              <div className="rounded-md border border-border bg-card p-6">
+                <h2 className="mb-1 font-serif text-lg text-foreground">Şifre Oluştur</h2>
+                <p className="mb-4 font-sans text-xs leading-relaxed text-muted-foreground">
+                  Google ile kayıt oldunuz. Bir şifre oluşturarak bundan sonra <span className="font-semibold text-foreground">{user.email}</span> e-postanız ve şifrenizle de giriş yapabilirsiniz.
+                </p>
+                {passwordSet ? (
+                  <p className="font-sans text-sm text-primary">Şifreniz oluşturuldu. Artık e-posta ve şifrenizle de giriş yapabilirsiniz.</p>
+                ) : (
+                  <form onSubmit={submitNewPassword} className="space-y-4">
+                    <label className="block font-sans text-xs uppercase tracking-wider text-muted-foreground">
+                      Yeni şifre
+                      <div className="relative">
+                        <input
+                          required
+                          minLength={6}
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className={`${inputClass} pr-11`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword((v) => !v)}
+                          aria-label={showNewPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+                          className="absolute inset-y-0 right-0 mt-2 flex items-center px-3 text-muted-foreground hover:text-primary"
+                        >
+                          {showNewPassword ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}
+                        </button>
+                      </div>
+                    </label>
+                    <label className="block font-sans text-xs uppercase tracking-wider text-muted-foreground">
+                      Yeni şifre (tekrar)
+                      <input
+                        required
+                        minLength={6}
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newConfirm}
+                        onChange={(e) => setNewConfirm(e.target.value)}
+                        className={inputClass}
+                      />
+                      {newConfirm.length > 0 && newConfirm !== newPassword ? (
+                        <span className="mt-1 block normal-case tracking-normal text-destructive">Şifreler eşleşmiyor.</span>
+                      ) : null}
+                    </label>
+                    <button disabled={passwordBusy} className="w-full rounded-md bg-primary px-4 py-3 font-sans text-xs uppercase tracking-wider text-primary-foreground disabled:opacity-50">
+                      {passwordBusy ? 'Bekleyin…' : 'Şifreyi kaydet'}
+                    </button>
+                    {passwordMessage ? <p className="font-sans text-sm normal-case tracking-normal text-destructive">{passwordMessage}</p> : null}
+                  </form>
+                )}
+              </div>
+            ) : null}
           </div>
         ) : awaitingActivation ? (
           <div className="space-y-5 rounded-md border-2 border-primary bg-accent/15 p-8 text-center">
