@@ -8,6 +8,7 @@ import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
+import { usePurchaseNotice } from '@/components/purchase-notice-provider'
 import { shopPriceLabel } from '@/lib/shop'
 import { useProducts } from '@/components/products-provider'
 import { loadAddresses, getSelectedAddressId, setSelectedAddressId, isShippingComplete, type ShippingAddress } from '@/lib/shipping'
@@ -22,6 +23,7 @@ export default function SepetPage() {
   const { lang } = useLanguage()
   const { items, count, subtotalKurus, setQuantity, remove } = useCart()
   const { getProduct } = useProducts()
+  const { requestPurchase } = usePurchaseNotice()
   const tr = lang === 'tr'
 
   const [addresses, setAddresses] = useState<ShippingAddress[]>([])
@@ -72,20 +74,23 @@ export default function SepetPage() {
     setAddressError(false)
   }
 
-  const handlePay = async () => {
+  const handlePay = () => {
     const noAddress = !selectedAddress || !isShippingComplete(selectedAddress)
     setAddressError(noAddress)
     if (noAddress || !selectedAddress) {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
-    if (selectedAddress) setSelectedAddressId(selectedAddress.id)
-    const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress, promoCode)
-    if (!result.ok) {
-      window.alert(tr ? 'Sipariş oluşturulamadı. Lütfen sepetinizi ve adresinizi kontrol edin.' : 'The order could not be created. Please check your cart and address.')
-      return
-    }
-    window.location.href = `/odeme?order=${encodeURIComponent(result.orderId)}`
+    requestPurchase(async () => {
+      if (!selectedAddress) return
+      setSelectedAddressId(selectedAddress.id)
+      const result = await createShopOrder(items.map((item) => ({ id: item.id, quantity: item.quantity })), selectedAddress, promoCode)
+      if (!result.ok) {
+        window.alert(tr ? 'Sipariş oluşturulamadı. Lütfen sepetinizi ve adresinizi kontrol edin.' : 'The order could not be created. Please check your cart and address.')
+        return
+      }
+      window.location.href = `/odeme?order=${encodeURIComponent(result.orderId)}`
+    })
   }
 
   const t = tr

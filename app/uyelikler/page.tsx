@@ -1,11 +1,14 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Crown, ShieldCheck, FileText } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
 import { ArchiveNavigation } from '@/components/archive-navigation'
 import { SiteFooter } from '@/components/site-footer'
 import { useLanguage } from '@/components/language-provider'
+import { usePurchaseNotice } from '@/components/purchase-notice-provider'
 import { MembershipCodeRedeemer } from '@/components/membership-code-redeemer'
 import { PRODUCTS, priceLabel, type Product } from '@/lib/products'
 
@@ -17,6 +20,8 @@ function periodLabel(product: Product, tr: boolean): string {
 
 function StoreCard({ product, highlight }: { product: Product; highlight?: boolean }) {
   const { lang } = useLanguage()
+  const router = useRouter()
+  const { requestPurchase } = usePurchaseNotice()
   const tr = lang === 'tr'
   const Icon = product.kind === 'single' ? FileText : product.tier === 'platin' ? ShieldCheck : Crown
   return (
@@ -30,22 +35,29 @@ function StoreCard({ product, highlight }: { product: Product; highlight?: boole
         <span className="ml-1 font-sans text-xs font-normal uppercase tracking-wider text-muted-foreground">{periodLabel(product, tr)}</span>
       </p>
       <p className="flex-1 font-sans text-sm leading-relaxed text-muted-foreground">{tr ? product.description : product.descriptionEn}</p>
-      <Link
-        href={`/odeme?plan=${product.id}`}
+      <button
+        type="button"
+        onClick={() => requestPurchase(() => router.push(`/odeme?plan=${product.id}`))}
         className={`mt-2 rounded-md px-4 py-2 text-center font-sans text-xs uppercase tracking-wider transition-colors ${highlight ? 'bg-primary text-primary-foreground hover:opacity-90' : 'border border-primary/60 text-primary hover:bg-primary hover:text-primary-foreground'}`}
       >
         {tr ? 'Satın al' : 'Buy'}
-      </Link>
+      </button>
     </div>
   )
 }
 
 export default function MembershipStorePage() {
   const { lang } = useLanguage()
+  const { showNotice } = usePurchaseNotice()
   const tr = lang === 'tr'
   const subscriptions = PRODUCTS.filter((p) => p.kind === 'subscription')
   const lifetime = PRODUCTS.filter((p) => p.kind === 'lifetime' && p.id !== 'platin-lifetime-upgrade')
   const single = PRODUCTS.filter((p) => p.kind === 'single')
+
+  useEffect(() => {
+    showNotice()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <main className="min-h-svh bg-background">
