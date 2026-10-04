@@ -5,12 +5,14 @@ import { Minus, Plus, ShoppingCart, Trash2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/components/cart-provider'
 import { useProducts } from '@/components/products-provider'
+import { usePurchaseNotice } from '@/components/purchase-notice-provider'
 import { shopPriceLabel } from '@/lib/shop'
 
 export function CartSidebar() {
   const router = useRouter()
   const { items, count, subtotalKurus, setQuantity, remove } = useCart()
   const { getProduct } = useProducts()
+  const { requestPurchase } = usePurchaseNotice()
   const [open, setOpen] = useState(false)
 
   return (
@@ -59,7 +61,7 @@ export function CartSidebar() {
             </div>
             <footer className="border-t border-border p-5">
               <div className="mb-4 flex items-center justify-between font-sans text-sm"><span className="text-muted-foreground">Ara toplam</span><strong className="text-foreground">{shopPriceLabel(subtotalKurus)}</strong></div>
-              <button type="button" disabled={!items.length} onClick={() => { setOpen(false); router.push('/sepet') }} className="w-full rounded-md bg-primary px-4 py-3 font-sans text-sm font-medium uppercase tracking-wider text-primary-foreground disabled:opacity-50">Satın alma ekranına git</button>
+              <button type="button" disabled={!items.length} onClick={() => requestPurchase(() => { setOpen(false); router.push('/sepet') })} className="w-full rounded-md bg-primary px-4 py-3 font-sans text-sm font-medium uppercase tracking-wider text-primary-foreground disabled:opacity-50">Satın alma ekranına git</button>
             </footer>
           </aside>
         </div>

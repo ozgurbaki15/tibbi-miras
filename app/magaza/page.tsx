@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Check, ShoppingBag, ShoppingCart } from 'lucide-react'
 import { ArchiveHeader } from '@/components/archive-header'
@@ -9,6 +9,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/components/cart-provider'
 import { useLanguage } from '@/components/language-provider'
 import { useProducts } from '@/components/products-provider'
+import { usePurchaseNotice } from '@/components/purchase-notice-provider'
 import { shopPriceLabel, type ShopProduct } from '@/lib/shop'
 import { ProductRelatedArticles } from '@/components/product-related-articles'
 
@@ -59,7 +60,13 @@ export default function MagazaPage() {
   const { lang } = useLanguage()
   const { count } = useCart()
   const { products, categories, loading } = useProducts()
+  const { showNotice } = usePurchaseNotice()
   const [activeCategory, setActiveCategory] = useState<string>('all')
+
+  useEffect(() => {
+    showNotice()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const t = lang === 'tr'
     ? {

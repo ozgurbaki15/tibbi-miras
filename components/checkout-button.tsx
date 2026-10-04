@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createPaytrPayment } from '@/app/actions/paytr'
 import { useLanguage } from '@/components/language-provider'
+import { usePurchaseNotice } from '@/components/purchase-notice-provider'
 
 const ERRORS: Record<string, { tr: string; en: string }> = {
   auth_required: { tr: 'Ödeme için giriş yapın.', en: 'Please sign in to pay.' },
@@ -16,6 +17,7 @@ const ERRORS: Record<string, { tr: string; en: string }> = {
 
 export function CheckoutButton({ productId, label, articleId, variant = 'solid' }: { productId: string; label: string; articleId?: string; variant?: 'solid' | 'outline' }) {
   const { lang } = useLanguage()
+  const { requestPurchase } = usePurchaseNotice()
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -39,7 +41,7 @@ export function CheckoutButton({ productId, label, articleId, variant = 'solid' 
 
   return (
     <div className="flex flex-col gap-1">
-      <button type="button" onClick={start} disabled={busy} className={`rounded-md px-4 py-2 font-sans text-xs uppercase tracking-wider transition-colors disabled:opacity-50 ${base}`}>
+      <button type="button" onClick={() => requestPurchase(start)} disabled={busy} className={`rounded-md px-4 py-2 font-sans text-xs uppercase tracking-wider transition-colors disabled:opacity-50 ${base}`}>
         {busy ? (lang === 'tr' ? 'Yükleniyor…' : 'Loading…') : label}
       </button>
       {message ? <p className="font-sans text-xs text-destructive">{message}</p> : null}

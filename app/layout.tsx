@@ -7,6 +7,7 @@ import { CartProvider } from '@/components/cart-provider'
 import { CartSidebar } from '@/components/cart-sidebar'
 import { ProductsProvider } from '@/components/products-provider'
 import { EntitlementsProvider } from '@/components/entitlements-provider'
+import { PurchaseNoticeProvider } from '@/components/purchase-notice-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import Script from 'next/script'
 import './globals.css'
@@ -63,6 +64,7 @@ export default function RootLayout({
               <LanguageProvider>
               <ProductsProvider>
               <CartProvider>
+              <PurchaseNoticeProvider>
               <div id="page-content" className="flex-grow scroll-mt-2">{children}</div>
               <CartSidebar />
               <footer className="mt-12 w-full border-t border-border/40 bg-background/95 py-6">
@@ -77,6 +79,7 @@ export default function RootLayout({
                   </a>
                 </div>
               </footer>
+              </PurchaseNoticeProvider>
               </CartProvider>
               </ProductsProvider>
               </LanguageProvider>
